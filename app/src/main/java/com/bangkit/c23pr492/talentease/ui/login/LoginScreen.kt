@@ -30,13 +30,36 @@ import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
 import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.autofill
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = viewModel(
         factory = ViewModelFactory.getInstance(LocalContext.current)
-    )
+    ),
+    navigateToHome: (String) -> Unit,
+    navigateToRegister: () -> Unit,
+) {
+    val tokenState = loginViewModel.tokenState.collectAsState()
+    tokenState.value.let {
+        when (it) {
+            UiState.Initial -> loginViewModel.getToken()
+            is UiState.Loading -> CircularProgressIndicator()
+            is UiState.Empty -> LoginScreenContent(modifier, loginViewModel, navigateToHome)
+            is UiState.Error -> Log.d("login", "LoginScreen: error ${it.error}")
+            is UiState.Success -> {
+                Log.d("login", "LoginScreen: success ${it.data}")
+                navigateToHome(it.data)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun LoginScreenContent(
+    modifier: Modifier,
+    loginViewModel: LoginViewModel,
+    navigateToHome: (String) -> Unit
 ) {
     val authDataState = loginViewModel.loginState.collectAsState()
     Column(
@@ -109,13 +132,14 @@ fun LoginScreen(
     }
 
     authDataState.value.let {
-        when(it) {
+        when (it) {
             UiState.Initial -> Log.d("login", "LoginScreen: Initial")
             is UiState.Loading -> CircularProgressIndicator()
             is UiState.Empty -> Log.d("login", "LoginScreen: Empty")
             is UiState.Error -> Log.d("login", "LoginScreen: error ${it.error}")
             is UiState.Success -> {
                 Log.d("login", "LoginScreen: success ${it.data}")
+                navigateToHome(it.data)
             }
         }
     }
@@ -125,6 +149,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     TalentEaseTheme {
-        LoginScreen()
+        LoginScreen(navigateToRegister = {}, navigateToHome = {})
     }
 }

@@ -17,11 +17,53 @@ class Repository(
     private val firebaseAuth: FirebaseAuth,
     private val authDataStore: AuthDataStore
 ) {
+    fun getToken(): Flow<String?> = authDataStore.getToken()
+
+    suspend fun saveToken(token: String) {
+        authDataStore.saveToken(token)
+    }
+
+    private suspend fun clearToken() {
+        authDataStore.clearToken()
+    }
+
     fun loginUser(email: String, password: String): Flow<Resource<FirebaseUser?>> = flow {
         emit(Resource.Loading)
         try {
             val response = firebaseAuth.signInWithEmailAndPassword(email, password).await()
             emit(Resource.Success(response.user))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            if (e.message.isNullOrBlank()) {
+                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
+            } else {
+                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun registerUser(email: String, password: String): Flow<Resource<FirebaseUser?>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            emit(Resource.Success(response.user))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            if (e.message.isNullOrBlank()) {
+                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
+            } else {
+                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun logoutUser(): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = firebaseAuth.signOut().also {
+                clearToken()
+            }
+            emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(tagRepository, Log.getStackTraceString(e))
             if (e.message.isNullOrBlank()) {
