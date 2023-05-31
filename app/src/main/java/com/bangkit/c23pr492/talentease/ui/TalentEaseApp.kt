@@ -17,7 +17,7 @@ fun TalentEaseApp(
     NavHost(
         navController = navController,
         startDestination = authGraphRoute,
-        modifier = Modifier
+        modifier = modifier
     ) {
         authNavGraph(navController)
         mainNavGraph(navController)

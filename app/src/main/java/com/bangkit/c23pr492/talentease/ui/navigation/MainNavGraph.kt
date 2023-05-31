@@ -25,6 +25,7 @@ fun NavGraphBuilder.mainNavGraph(
             HomeScreen(
                 token = token,
                 navigateToLogin = {
+                    navController.popBackStack()
                     navController.navigate(Screen.Login.route)
                 }
             )
