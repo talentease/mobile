@@ -5,14 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bangkit.c23pr492.talentease.data.Repository
 import com.bangkit.c23pr492.talentease.di.Injection
+import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.home.HomeViewModel
-import com.bangkit.c23pr492.talentease.ui.login.LoginViewModel
 
 class ViewModelFactory private constructor(private val repository: Repository): ViewModelProvider.NewInstanceFactory(){
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         when {
-            modelClass.isAssignableFrom(LoginViewModel::class.java) -> return LoginViewModel(repository) as T
+            modelClass.isAssignableFrom(AuthViewModel::class.java) -> return AuthViewModel(repository) as T
+//            modelClass.isAssignableFrom(LoginViewModel::class.java) -> return LoginViewModel(repository) as T
 //            modelClass.isAssignableFrom(RegisterViewModel::class.java) -> return RegisterViewModel(repository) as T
             modelClass.isAssignableFrom(HomeViewModel::class.java) -> return HomeViewModel(repository) as T
 //            modelClass.isAssignableFrom(MainViewModel::class.java) -> return MainViewModel(repository) as T

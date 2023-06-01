@@ -19,9 +19,12 @@ fun NavGraphBuilder.authNavGraph(
             route = Screen.Login.route
         ) {
             LoginScreen(
-                navigateToHome = { navToken ->
-                    navController.popBackStack()
-                    navController.navigate(Screen.Home.createRoute(navToken))
+                navigateToHome = { route ->
+                    navController.navigate(route) {
+                        popUpTo(authGraphRoute) {
+                            inclusive = true
+                        }
+                    }
                 },
                 navigateToRegister = {
                     navController.navigate(Screen.Register.route)

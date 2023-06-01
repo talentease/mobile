@@ -24,9 +24,12 @@ fun NavGraphBuilder.mainNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             HomeScreen(
                 token = token,
-                navigateToLogin = {
-                    navController.popBackStack()
-                    navController.navigate(Screen.Login.route)
+                navigateToLogin = { route ->
+                    navController.navigate(route) {
+                        popUpTo(mainGraphRoute) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }

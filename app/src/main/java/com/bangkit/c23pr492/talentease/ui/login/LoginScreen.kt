@@ -1,6 +1,5 @@
 package com.bangkit.c23pr492.talentease.ui.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,49 +25,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.ui.common.UiState
+import com.bangkit.c23pr492.talentease.ui.AuthViewModel
+import com.bangkit.c23pr492.talentease.ui.common.UiEvents
+import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
 import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.autofill
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
-    loginViewModel: LoginViewModel = viewModel(
+    authViewModel: AuthViewModel = viewModel(
         factory = ViewModelFactory.getInstance(LocalContext.current)
     ),
     navigateToHome: (String) -> Unit,
     navigateToRegister: () -> Unit,
 ) {
-    val tokenState = loginViewModel.tokenState.collectAsState()
-    tokenState.value.let {
-        when (it) {
-            UiState.Initial -> loginViewModel.getToken()
-            is UiState.Loading -> CircularProgressIndicator()
-            is UiState.Empty -> LoginScreenContent(
-                modifier,
-                loginViewModel,
-                navigateToHome,
-                navigateToRegister
-            )
-            is UiState.Error -> Log.d("login", "LoginScreen: error ${it.error}")
-            is UiState.Success -> {
-                Log.d("login", "LoginScreen: success ${it.data}")
-                navigateToHome(it.data)
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(key1 = true) {
+        authViewModel.isLogin()
+        authViewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvents.Loading -> isLoading = true
+                is UiEvents.NavigateEvent -> {
+                    isLoading = false
+                    navigateToHome(event.route)
+                }
+                is UiEvents.SnackBarEvent -> {
+                    isLoading = false
+                }
             }
         }
     }
+    LoadingProgressBar(isLoading = isLoading)
+    LoginScreenContent(
+        modifier,
+        authViewModel,
+        navigateToRegister
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreenContent(
     modifier: Modifier,
-    loginViewModel: LoginViewModel,
-    navigateToHome: (String) -> Unit,
+    authViewModel: AuthViewModel,
     navigateToRegister: () -> Unit
 ) {
-    val authDataState = loginViewModel.loginState.collectAsState()
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,6 +80,7 @@ fun LoginScreenContent(
     ) {
         var textEmail by rememberSaveable { mutableStateOf("") }
         var textPassword by rememberSaveable { mutableStateOf("") }
+
         Image(
             painter = painterResource(id = R.drawable.ic_talentease),
             contentDescription = null,
@@ -91,7 +96,7 @@ fun LoginScreenContent(
             Text(
                 text = "Easily track your applications and talents",
                 fontWeight = FontWeight.Light,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 32.dp)
             )
             Text(
                 text = "Email",
@@ -161,16 +166,20 @@ fun LoginScreenContent(
             )
             Button(
                 onClick = {
-                    loginViewModel.loginUser(textEmail, textPassword)
+                    authViewModel.login(textEmail, textPassword)
                 },
-                modifier = Modifier.fillMaxWidth().padding(top = 48.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp)
             ) {
                 Text(text = "Log In")
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier.padding(top = 24.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(top = 24.dp)
+                    .fillMaxWidth()
             ) {
                 Text(
                     text = "Need an account?",
@@ -182,19 +191,6 @@ fun LoginScreenContent(
                     modifier = Modifier.clickable { navigateToRegister() },
                     color = MaterialTheme.colorScheme.primary
                 )
-            }
-        }
-    }
-
-    authDataState.value.let {
-        when (it) {
-            UiState.Initial -> Log.d("login", "LoginScreen: Initial")
-            is UiState.Loading -> CircularProgressIndicator()
-            is UiState.Empty -> Log.d("login", "LoginScreen: Empty")
-            is UiState.Error -> Log.d("login", "LoginScreen: error ${it.error}")
-            is UiState.Success -> {
-                Log.d("login", "LoginScreen: success ${it.data}")
-                navigateToHome(it.data)
             }
         }
     }

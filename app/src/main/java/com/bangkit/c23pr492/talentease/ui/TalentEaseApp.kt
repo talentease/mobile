@@ -4,10 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bangkit.c23pr492.talentease.ui.navigation.Screen
 import com.bangkit.c23pr492.talentease.ui.navigation.authNavGraph
 import com.bangkit.c23pr492.talentease.ui.navigation.mainNavGraph
-import com.bangkit.c23pr492.talentease.utils.Const.authGraphRoute
 
 @Composable
 fun TalentEaseApp(
@@ -16,19 +17,21 @@ fun TalentEaseApp(
 ) {
     NavHost(
         navController = navController,
-        startDestination = authGraphRoute,
+        startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
+        composable(route = Screen.Splash.route) {
+            SplashScreen(
+                navigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Screen.Splash.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
         authNavGraph(navController)
         mainNavGraph(navController)
     }
 }
-
-//@Composable
-//inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
-//    val navGraphRoute = destination.parent?.route ?: return viewModel()
-//    val parentEntry = remember(this) {
-//        navController.getBackStackEntry(navGraphRoute)
-//    }
-//    return viewModel(parentEntry)
-//}
