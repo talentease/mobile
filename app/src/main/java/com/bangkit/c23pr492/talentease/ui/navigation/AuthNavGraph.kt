@@ -34,7 +34,18 @@ fun NavGraphBuilder.authNavGraph(
         composable(
             route = Screen.Register.route
         ) {
-            RegisterScreen()
+            RegisterScreen(
+                navigateToLogin = {
+                    navController.navigate(Screen.Login.route)
+                },
+                navigateToLoginAlreadyRegister = { route ->
+                    navController.navigate(route) {
+                        popUpTo(authGraphRoute) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
     }
 }

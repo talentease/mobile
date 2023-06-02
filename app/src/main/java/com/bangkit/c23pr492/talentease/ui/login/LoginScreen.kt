@@ -33,9 +33,9 @@ fun LoginScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = ViewModelFactory.getInstance(LocalContext.current)
     ),
+    viewModel: LoginViewModel = viewModel(),
     navigateToHome: (String) -> Unit,
     navigateToRegister: () -> Unit,
-    viewModel: LoginViewModel = viewModel()
 ) {
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = true) {
