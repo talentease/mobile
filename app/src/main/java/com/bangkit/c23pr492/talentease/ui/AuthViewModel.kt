@@ -18,7 +18,7 @@ class AuthViewModel(private val repository: Repository) : ViewModel() {
     private val _tokenState = MutableStateFlow<UiState<String>>(UiState.Initial)
     val tokenState = _tokenState.asStateFlow()
 
-    private val  _eventFlow = MutableSharedFlow<UiEvents>()
+    private val _eventFlow = MutableSharedFlow<UiEvents>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
@@ -27,7 +27,7 @@ class AuthViewModel(private val repository: Repository) : ViewModel() {
 
     fun isLogin() = viewModelScope.launch(Dispatchers.IO) {
         _tokenState.collectLatest {
-            when(it) {
+            when (it) {
                 is UiState.Success -> {
                     _eventFlow.emit(UiEvents.NavigateEvent(Screen.Home.createRoute(it.data)))
                 }
@@ -78,9 +78,19 @@ class AuthViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
+    fun register(email: String, password: String) = viewModelScope.launch(Dispatchers.IO) {
+        repository.registerUser(email, password).collect {
+            when (it) {
+                is Resource.Loading -> _eventFlow.emit(UiEvents.Loading)
+                is Resource.Success -> _eventFlow.emit(UiEvents.NavigateEvent(Screen.Login.route))
+                is Resource.Error -> _eventFlow.emit(UiEvents.SnackBarEvent(it.error))
+            }
+        }
+    }
+
     fun logout() = viewModelScope.launch(Dispatchers.IO) {
         repository.logoutUser().collect {
-            when(it) {
+            when (it) {
                 is Resource.Loading -> _tokenState.emit(UiState.Loading)
                 is Resource.Success -> _tokenState.emit(UiState.Empty)
                 is Resource.Error -> _tokenState.emit(UiState.Error(it.error))
