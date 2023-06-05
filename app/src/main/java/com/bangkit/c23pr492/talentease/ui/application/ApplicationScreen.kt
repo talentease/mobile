@@ -1,17 +1,44 @@
 package com.bangkit.c23pr492.talentease.ui.application
 
 import android.content.Context
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bangkit.c23pr492.talentease.R
+import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
+import com.bangkit.c23pr492.talentease.ui.component.ApplicationItems
+import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
+import com.bangkit.c23pr492.talentease.ui.core.UiState
+import com.bangkit.c23pr492.talentease.utils.Const.tagTestList
+import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
 import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
+import kotlinx.coroutines.launch
 
 @Composable
 fun ApplicationScreen(
@@ -21,8 +48,105 @@ fun ApplicationScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = ViewModelFactory.getInstance(context)
     ),
+    applicationViewModel: ApplicationViewModel = viewModel(
+        factory = ViewModelFactory.getInstance(context)
+    )
 ) {
+    val listDataState = applicationViewModel.listApplicationState.collectAsState()
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LoadingProgressBar(isLoading = isLoading)
-    Text(text = token)
+//    Text(text = token)
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = modifier.fillMaxSize()
+    ) {
+        val listState = rememberLazyListState()
+        listDataState.value.let { state ->
+            when (state) {
+                UiState.Initial -> applicationViewModel.getLanguages()
+                is UiState.Loading -> CircularProgressIndicator()
+                is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
+                is UiState.Success -> ApplicationContentScreen(
+                    listState,
+                    state.data,
+//                    navigateToDetail = navigateToDetail
+                )
+                is UiState.Error -> Toast.makeText(
+                    LocalContext.current,
+                    state.error.asString(LocalContext.current),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+    Log.d("token", "ApplicationScreen: $token")
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ApplicationContentScreen(
+    listState: LazyListState = rememberLazyListState(),
+    data: List<ApplicationModel>,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        val scope = rememberCoroutineScope()
+        val showButton: Boolean by remember {
+            derivedStateOf { listState.firstVisibleItemIndex > 1 }
+        }
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(bottom = 80.dp),
+            modifier = modifier.testTag(tagTestList)
+        ) {
+            item { }
+            items(data, key = { it.id }) { application ->
+                ApplicationItems(
+                    application,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .animateItemPlacement(tween(durationMillis = 100)),
+//                    navigateToDetail = navigateToDetail
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = showButton,
+            enter = fadeIn() + slideInVertically(),
+            exit = fadeOut() + slideOutVertically(),
+            modifier = Modifier
+                .padding(bottom = 30.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            ScrollToTopButton(
+                onClick = {
+                    scope.launch {
+                        listState.scrollToItem(index = 0)
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ScrollToTopButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .shadow(elevation = 6.dp, shape = RoundedCornerShape(size = 24.dp))
+            .clip(shape = RoundedCornerShape(size = 24.dp)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.primary
+        )
+    ) {
+        Icon(
+            imageVector = Icons.Filled.KeyboardArrowUp,
+            contentDescription = null
+        )
+    }
 }

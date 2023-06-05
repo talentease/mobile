@@ -22,16 +22,16 @@ fun SplashScreen(
     Text(text = "SplashScreen")
     LaunchedEffect(key1 = true) {
         authViewModel.apply {
-            isLogin()
             getToken()
+            isLogin()
             eventFlow.collectLatest { event ->
                 when (event) {
+                    is UiEvents.SnackBarEvent -> {}
                     is UiEvents.Loading -> {}
                     is UiEvents.NavigateEvent -> {
                         navigate(event.route)
                         token(event.route.substringAfter("/"))
                     }
-                    is UiEvents.SnackBarEvent -> {}
                 }
             }
         }
