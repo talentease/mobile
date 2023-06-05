@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.common
+package com.bangkit.c23pr492.talentease.ui.core
 
 import com.bangkit.c23pr492.talentease.utils.UiText
 

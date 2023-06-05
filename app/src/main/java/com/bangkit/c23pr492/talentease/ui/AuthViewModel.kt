@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.Repository
 import com.bangkit.c23pr492.talentease.data.Resource
-import com.bangkit.c23pr492.talentease.ui.common.UiEvents
-import com.bangkit.c23pr492.talentease.ui.common.UiState
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
+import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.ui.navigation.Screen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -29,7 +29,7 @@ class AuthViewModel(private val repository: Repository) : ViewModel() {
         _tokenState.collectLatest {
             when (it) {
                 is UiState.Success -> {
-                    _eventFlow.emit(UiEvents.NavigateEvent(Screen.Home.createRoute(it.data)))
+                    _eventFlow.emit(UiEvents.NavigateEvent(Screen.Application.createRoute(it.data)))
                 }
                 is UiState.Empty -> {
                     _eventFlow.emit(UiEvents.NavigateEvent(Screen.Login.route))

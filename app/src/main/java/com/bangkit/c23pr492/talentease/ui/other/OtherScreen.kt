@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.home
+package com.bangkit.c23pr492.talentease.ui.other
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
-import com.bangkit.c23pr492.talentease.ui.common.UiEvents
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun HomeScreen(
+fun OtherScreen(
     token: String,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
@@ -47,7 +47,6 @@ fun HomeScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = token)
         Button(
             onClick = {
                 authViewModel.logout()

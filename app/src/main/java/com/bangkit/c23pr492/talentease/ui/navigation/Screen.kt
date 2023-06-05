@@ -6,7 +6,13 @@ sealed class Screen(val route: String) {
     object Splash : Screen("splash")
     object Login : Screen("login")
     object Register : Screen("register")
-    object Home : Screen("home/{$navKeyToken}") {
-        fun createRoute(token: String) = "home/$token"
+    object Application : Screen("application/{$navKeyToken}") {
+        fun createRoute(token: String) = "application/$token"
+    }
+    object Position : Screen("position/{$navKeyToken}") {
+        fun createRoute(token: String) = "position/$token"
+    }
+    object Other : Screen("other/{$navKeyToken}") {
+        fun createRoute(token: String) = "other/$token"
     }
 }

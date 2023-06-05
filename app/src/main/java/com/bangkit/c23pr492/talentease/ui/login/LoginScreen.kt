@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
-import com.bangkit.c23pr492.talentease.ui.common.UiEvents
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.component.EmailTextField
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.component.PasswordTextField
