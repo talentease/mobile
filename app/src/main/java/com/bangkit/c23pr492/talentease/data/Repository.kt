@@ -88,6 +88,20 @@ class Repository(
         }
     }.flowOn(Dispatchers.IO)
 
+    fun searchLanguages(query: String): Flow<Resource<List<ApplicationModel>>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = ApplicationsData.listData.filter {
+                it.name.contains(query, ignoreCase = true)
+            }
+            Log.d(tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
+
     companion object {
         @Volatile
         private var instance: Repository? = null

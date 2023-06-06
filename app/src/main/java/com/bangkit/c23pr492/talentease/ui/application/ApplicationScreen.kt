@@ -6,15 +6,17 @@ import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,8 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,7 @@ import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
 import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationScreen(
     token: String,
@@ -53,13 +54,13 @@ fun ApplicationScreen(
     )
 ) {
     val listDataState = applicationViewModel.listApplicationState.collectAsState()
-    var isLoading by rememberSaveable { mutableStateOf(false) }
+    val isLoading by rememberSaveable { mutableStateOf(false) }
     LoadingProgressBar(isLoading = isLoading)
-//    Text(text = token)
-    Box(
-        contentAlignment = Alignment.TopCenter,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
+        SearchBarScreen(applicationViewModel)
         val listState = rememberLazyListState()
         listDataState.value.let { state ->
             when (state) {
@@ -80,6 +81,47 @@ fun ApplicationScreen(
         }
     }
     Log.d("token", "ApplicationScreen: $token")
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBarScreen(applicationViewModel: ApplicationViewModel) {
+    val query by applicationViewModel.query.collectAsState()
+    var active by rememberSaveable { mutableStateOf(false) }
+    SearchBar(
+        query = query,
+        onQueryChange = applicationViewModel::searchApplications,
+        onSearch = {
+            active = false
+        },
+        active = active,
+        onActiveChange = {
+            active = it
+        },
+        placeholder = {
+            Text(text = "Search talent's name")
+        },
+        leadingIcon = {
+            Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+        },
+        trailingIcon = {
+            if (active) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.clickable {
+                        if (query.isNotEmpty()) {
+                            applicationViewModel.searchApplications("")
+                        } else {
+                            active = false
+                        }
+                    }
+                )
+            }
+        }
+    ) {
+
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

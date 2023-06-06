@@ -3,6 +3,7 @@ package com.bangkit.c23pr492.talentease.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,9 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -85,7 +84,7 @@ private fun BottomBar(
         ),
         NavigationItem(
             title = stringResource(R.string.position),
-            icon = ImageVector.vectorResource(R.drawable.ic_position),
+            icon = Icons.Default.Groups,
             screen = Screen.Position,
             routeWithToken = Screen.Position.createRoute(token),
             contentDesc = stringResource(R.string.position_page)

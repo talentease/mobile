@@ -16,6 +16,9 @@ class ApplicationViewModel(private val repository: Repository) : ViewModel() {
         MutableStateFlow<UiState<List<ApplicationModel>>>(UiState.Initial)
     val listApplicationState = _listApplicationState.asStateFlow()
 
+    private val _query = MutableStateFlow("")
+    val query = _query.asStateFlow()
+
     fun getLanguages() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getApplications().collect { resource ->
@@ -23,6 +26,25 @@ class ApplicationViewModel(private val repository: Repository) : ViewModel() {
                     Resource.Loading -> _listApplicationState.emit(UiState.Loading)
                     is Resource.Success -> {
                         _listApplicationState.emit(UiState.Success(resource.data))
+                    }
+                    is Resource.Error -> {
+                        _listApplicationState.emit(UiState.Error(resource.error))
+                    }
+                }
+            }
+        }
+    }
+
+    fun searchApplications(newQuery: String) {
+        _query.value = newQuery
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.searchLanguages(newQuery).collect { resource ->
+                when (resource) {
+                    Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+                    is Resource.Success -> {
+                        _listApplicationState.emit(
+                            if (resource.data.isNotEmpty()) UiState.Success(resource.data) else UiState.Empty
+                        )
                     }
                     is Resource.Error -> {
                         _listApplicationState.emit(UiState.Error(resource.error))
