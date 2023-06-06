@@ -3,6 +3,8 @@ package com.bangkit.c23pr492.talentease.data
 import android.util.Log
 import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.data.datastore.AuthDataStore
+import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
+import com.bangkit.c23pr492.talentease.data.model.ApplicationsData
 import com.bangkit.c23pr492.talentease.utils.Const.tagRepository
 import com.bangkit.c23pr492.talentease.utils.UiText
 import com.google.firebase.auth.FirebaseAuth
@@ -71,6 +73,32 @@ class Repository(
             } else {
                 emit(Resource.Error(UiText.DynamicString(e.message.toString())))
             }
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getApplications(): Flow<Resource<List<ApplicationModel>>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = ApplicationsData.listData
+            Log.d(tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun searchLanguages(query: String): Flow<Resource<List<ApplicationModel>>> = flow {
+        emit(Resource.Loading)
+        try {
+            val response = ApplicationsData.listData.filter {
+                it.name.contains(query, ignoreCase = true)
+            }
+            Log.d(tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
     }.flowOn(Dispatchers.IO)
 

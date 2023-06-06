@@ -6,7 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bangkit.c23pr492.talentease.ui.common.UiEvents
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
@@ -17,16 +17,23 @@ fun SplashScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = ViewModelFactory.getInstance(LocalContext.current)
     ),
+    token: (String) -> Unit
 ) {
+    Text(text = "SplashScreen")
     LaunchedEffect(key1 = true) {
-        authViewModel.isLogin()
-        authViewModel.eventFlow.collectLatest { event ->
-            when (event) {
-                is UiEvents.Loading -> {}
-                is UiEvents.NavigateEvent -> { navigate(event.route) }
-                is UiEvents.SnackBarEvent -> {}
+        authViewModel.apply {
+            getToken()
+            isLogin()
+            eventFlow.collectLatest { event ->
+                when (event) {
+                    is UiEvents.SnackBarEvent -> {}
+                    is UiEvents.Loading -> {}
+                    is UiEvents.NavigateEvent -> {
+                        navigate(event.route)
+                        token(event.route.substringAfter("/"))
+                    }
+                }
             }
         }
     }
-    Text(text = "SplashScreen")
 }

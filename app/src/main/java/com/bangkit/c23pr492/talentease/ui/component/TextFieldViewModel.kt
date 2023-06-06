@@ -3,7 +3,7 @@ package com.bangkit.c23pr492.talentease.ui.component
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 
-abstract class TextFieldViewModel() : ViewModel() {
+abstract class TextFieldViewModel : ViewModel() {
     abstract val email: String
 
     abstract val emailNotValidState: StateFlow<Boolean>

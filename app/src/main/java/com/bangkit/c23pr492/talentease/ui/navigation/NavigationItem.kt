@@ -6,5 +6,6 @@ data class NavigationItem(
     val title: String,
     val icon: ImageVector,
     val screen: Screen,
+    val routeWithToken: String,
     val contentDesc: String
 )

@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Talent Ease</string>
     <string name="unknown_error">Unknown Error</string>
+    <string name="application">Application</string>
+    <string name="position">Position</string>
+    <string name="other">Other</string>
+    <string name="application_page">Application Page</string>
+    <string name="position_page">Position Page</string>
+    <string name="other_page">Other Page</string>
+    <string name="empty_list">Does not have a list to display</string>
 </resources>
