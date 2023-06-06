@@ -35,22 +35,22 @@ import com.bangkit.c23pr492.talentease.ui.component.ApplicationItems
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.core.UiState
+import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.Const.tagTestList
+import com.bangkit.c23pr492.talentease.utils.MainViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
-import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationScreen(
     token: String,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     authViewModel: AuthViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(context)
+        factory = AuthViewModelFactory.getInstance(context)
     ),
     applicationViewModel: ApplicationViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(context)
+        factory = MainViewModelFactory.getInstance(context)
     )
 ) {
     val listDataState = applicationViewModel.listApplicationState.collectAsState()
@@ -64,7 +64,7 @@ fun ApplicationScreen(
         val listState = rememberLazyListState()
         listDataState.value.let { state ->
             when (state) {
-                UiState.Initial -> applicationViewModel.getLanguages()
+                UiState.Initial -> applicationViewModel.getAllApplications()
                 is UiState.Loading -> CircularProgressIndicator()
                 is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
                 is UiState.Success -> ApplicationContentScreen(
@@ -141,7 +141,6 @@ fun ApplicationContentScreen(
             contentPadding = PaddingValues(bottom = 80.dp),
             modifier = modifier.testTag(tagTestList)
         ) {
-            item { }
             items(data, key = { it.id }) { application ->
                 ApplicationItems(
                     application,
@@ -151,6 +150,7 @@ fun ApplicationContentScreen(
 //                    navigateToDetail = navigateToDetail
                 )
             }
+            item { }
         }
         AnimatedVisibility(
             visible = showButton,

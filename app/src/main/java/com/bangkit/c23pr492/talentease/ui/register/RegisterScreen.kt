@@ -22,14 +22,14 @@ import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.component.EmailTextField
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.component.PasswordTextField
-import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     authViewModel: AuthViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(LocalContext.current)
+        factory = AuthViewModelFactory.getInstance(LocalContext.current)
     ),
     viewModel: RegisterViewModel = viewModel(),
     navigateToLogin: () -> Unit,

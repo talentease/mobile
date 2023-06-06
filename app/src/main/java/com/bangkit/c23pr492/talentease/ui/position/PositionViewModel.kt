@@ -1,53 +1,53 @@
-package com.bangkit.c23pr492.talentease.ui.application
+package com.bangkit.c23pr492.talentease.ui.position
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.MainRepository
 import com.bangkit.c23pr492.talentease.data.Resource
-import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
+import com.bangkit.c23pr492.talentease.data.model.PositionModel
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ApplicationViewModel(private val repository: MainRepository) : ViewModel() {
-    private val _listApplicationState =
-        MutableStateFlow<UiState<List<ApplicationModel>>>(UiState.Initial)
-    val listApplicationState = _listApplicationState.asStateFlow()
+class PositionViewModel(private val repository: MainRepository) : ViewModel() {
+    private val _listPositionState =
+        MutableStateFlow<UiState<List<PositionModel>>>(UiState.Initial)
+    val listPositionState = _listPositionState.asStateFlow()
 
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    fun getAllApplications() {
+    fun getAllPositions(token: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllApplications().collect { resource ->
+            repository.getAllPositions(token).collect { resource ->
                 when (resource) {
-                    Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+                    Resource.Loading -> _listPositionState.emit(UiState.Loading)
                     is Resource.Success -> {
-                        _listApplicationState.emit(UiState.Success(resource.data))
+                        _listPositionState.emit(UiState.Success(resource.data))
                     }
                     is Resource.Error -> {
-                        _listApplicationState.emit(UiState.Error(resource.error))
+                        _listPositionState.emit(UiState.Error(resource.error))
                     }
                 }
             }
         }
     }
 
-    fun searchApplications(newQuery: String) {
+    fun searchPositions(token: String, newQuery: String) {
         _query.value = newQuery
         viewModelScope.launch(Dispatchers.IO) {
-            repository.searchApplications(newQuery).collect { resource ->
+            repository.searchPositions(token, newQuery).collect { resource ->
                 when (resource) {
-                    Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+                    Resource.Loading -> _listPositionState.emit(UiState.Loading)
                     is Resource.Success -> {
-                        _listApplicationState.emit(
+                        _listPositionState.emit(
                             if (resource.data.isNotEmpty()) UiState.Success(resource.data) else UiState.Empty
                         )
                     }
                     is Resource.Error -> {
-                        _listApplicationState.emit(UiState.Error(resource.error))
+                        _listPositionState.emit(UiState.Error(resource.error))
                     }
                 }
             }

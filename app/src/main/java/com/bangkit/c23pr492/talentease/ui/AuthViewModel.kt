@@ -3,7 +3,7 @@ package com.bangkit.c23pr492.talentease.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bangkit.c23pr492.talentease.data.Repository
+import com.bangkit.c23pr492.talentease.data.AuthRepository
 import com.bangkit.c23pr492.talentease.data.Resource
 import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.core.UiState
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class AuthViewModel(private val repository: Repository) : ViewModel() {
+class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     private val _tokenState = MutableStateFlow<UiState<String>>(UiState.Initial)
     val tokenState = _tokenState.asStateFlow()

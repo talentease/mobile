@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
-import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -21,7 +21,7 @@ fun OtherScreen(
     token: String,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(LocalContext.current)
+        factory = AuthViewModelFactory.getInstance(LocalContext.current)
     ),
     navigateToLogin: (String) -> Unit,
 ) {

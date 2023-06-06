@@ -1,5 +1,12 @@
 package com.bangkit.c23pr492.talentease.data.network
 
-interface ApiService {
+import com.bangkit.c23pr492.talentease.data.model.PositionModel
+import retrofit2.http.GET
+import retrofit2.http.Header
 
+interface ApiService {
+    @GET("position")
+    suspend fun getAllPositions(
+        @Header("Authorization") token: String
+    ): List<PositionModel>
 }
