@@ -15,4 +15,13 @@ sealed class Screen(val route: String) {
     object Other : Screen("other/{$navKeyToken}") {
         fun createRoute(token: String) = "other/$token"
     }
+    object DetailApplication : Screen("application/detail/{$navKeyToken}") {
+        fun createRoute(token: String) = "application/detail/$token"
+    }
+    object DetailPosition : Screen("position/detail/{$navKeyToken}") {
+        fun createRoute(token: String) = "position/detail/$token"
+    }
+    object AddPosition : Screen("position/add/{$navKeyToken}") {
+        fun createRoute(token: String) = "position/add/$token"
+    }
 }

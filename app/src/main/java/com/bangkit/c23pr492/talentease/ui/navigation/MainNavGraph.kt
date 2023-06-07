@@ -9,6 +9,8 @@ import androidx.navigation.navArgument
 import com.bangkit.c23pr492.talentease.ui.application.ApplicationScreen
 import com.bangkit.c23pr492.talentease.ui.other.OtherScreen
 import com.bangkit.c23pr492.talentease.ui.position.PositionScreen
+import com.bangkit.c23pr492.talentease.ui.position.add.AddPositionScreen
+import com.bangkit.c23pr492.talentease.ui.position.detail.DetailPositionScreen
 import com.bangkit.c23pr492.talentease.utils.Const.mainGraphRoute
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
 
@@ -35,6 +37,12 @@ fun NavGraphBuilder.mainNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             PositionScreen(
                 token = token,
+                navigateToDetail = { route ->
+                    navController.navigate(route)
+                },
+                navigateToAdd = { navToken ->
+                    navController.navigate(Screen.AddPosition.createRoute(navToken))
+                }
             )
         }
         composable(
@@ -51,6 +59,24 @@ fun NavGraphBuilder.mainNavGraph(
                         }
                     }
                 }
+            )
+        }
+        composable(
+            route = Screen.DetailPosition.route,
+            arguments = listOf(navArgument(navKeyToken) { type = NavType.StringType }),
+        ) {
+            val token = it.arguments?.getString(navKeyToken) ?: ""
+            DetailPositionScreen(
+                token = token,
+            )
+        }
+        composable(
+            route = Screen.AddPosition.route,
+            arguments = listOf(navArgument(navKeyToken) { type = NavType.StringType }),
+        ) {
+            val token = it.arguments?.getString(navKeyToken) ?: ""
+            AddPositionScreen(
+                token = token,
             )
         }
     }

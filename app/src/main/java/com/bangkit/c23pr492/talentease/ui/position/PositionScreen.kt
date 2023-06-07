@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
@@ -49,32 +50,43 @@ fun PositionScreen(
     ),
     positionViewModel: PositionViewModel = viewModel(
         factory = MainViewModelFactory.getInstance(context)
-    )
+    ),
+    navigateToDetail: (String) -> Unit,
+    navigateToAdd: (String) -> Unit,
 ) {
     val listDataState = positionViewModel.listPositionState.collectAsState()
     val isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+    Scaffold(
+        modifier = modifier,
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navigateToAdd(token) }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add a new position")
+            }
+        }
     ) {
-        SearchBarScreen(token, positionViewModel)
-        val listState = rememberLazyGridState()
-        listDataState.value.let { state ->
-            when (state) {
-                UiState.Initial -> positionViewModel.getAllPositions(token)
-                is UiState.Loading -> CircularProgressIndicator()
-                is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
-                is UiState.Success -> PositionContentScreen(
-                    listState,
-                    state.data,
+        LoadingProgressBar(isLoading = isLoading, modifier = modifier)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(it).fillMaxSize()
+        ) {
+            SearchBarScreen(token, positionViewModel)
+            val listState = rememberLazyGridState()
+            listDataState.value.let { state ->
+                when (state) {
+                    UiState.Initial -> positionViewModel.getAllPositions(token)
+                    is UiState.Loading -> CircularProgressIndicator()
+                    is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
+                    is UiState.Success -> PositionContentScreen(
+                        listState,
+                        state.data,
 //                    navigateToDetail = navigateToDetail
-                )
-                is UiState.Error -> Toast.makeText(
-                    LocalContext.current,
-                    state.error.asString(LocalContext.current),
-                    Toast.LENGTH_SHORT
-                ).show()
+                    )
+                    is UiState.Error -> Toast.makeText(
+                        LocalContext.current,
+                        state.error.asString(LocalContext.current),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
