@@ -54,8 +54,8 @@ fun ApplicationScreen(
     )
 ) {
     val listDataState = applicationViewModel.listApplicationState.collectAsState()
-    val isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading)
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    LoadingProgressBar(isLoading = isLoading, modifier = modifier)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
@@ -64,19 +64,31 @@ fun ApplicationScreen(
         val listState = rememberLazyListState()
         listDataState.value.let { state ->
             when (state) {
-                UiState.Initial -> applicationViewModel.getAllApplications()
-                is UiState.Loading -> CircularProgressIndicator()
-                is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
-                is UiState.Success -> ApplicationContentScreen(
-                    listState,
-                    state.data,
+                UiState.Initial -> {
+                    isLoading = false
+                    applicationViewModel.getAllApplications()
+                }
+                is UiState.Loading -> isLoading = true
+                is UiState.Empty -> {
+                    isLoading = false
+                    EmptyContentScreen(R.string.empty_list, modifier)
+                }
+                is UiState.Success -> {
+                    isLoading = false
+                    ApplicationContentScreen(
+                        listState,
+                        state.data,
 //                    navigateToDetail = navigateToDetail
-                )
-                is UiState.Error -> Toast.makeText(
-                    LocalContext.current,
-                    state.error.asString(LocalContext.current),
-                    Toast.LENGTH_SHORT
-                ).show()
+                    )
+                }
+                is UiState.Error -> {
+                    isLoading = false
+                    Toast.makeText(
+                        LocalContext.current,
+                        state.error.asString(LocalContext.current),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

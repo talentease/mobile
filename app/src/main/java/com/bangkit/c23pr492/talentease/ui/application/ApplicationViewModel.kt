@@ -23,7 +23,7 @@ class ApplicationViewModel(private val repository: MainRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAllApplications().collect { resource ->
                 when (resource) {
-                    Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+                    is Resource.Loading -> _listApplicationState.emit(UiState.Loading)
                     is Resource.Success -> {
                         _listApplicationState.emit(UiState.Success(resource.data))
                     }
@@ -40,7 +40,7 @@ class ApplicationViewModel(private val repository: MainRepository) : ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             repository.searchApplications(newQuery).collect { resource ->
                 when (resource) {
-                    Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+                    is Resource.Loading -> _listApplicationState.emit(UiState.Loading)
                     is Resource.Success -> {
                         _listApplicationState.emit(
                             if (resource.data.isNotEmpty()) UiState.Success(resource.data) else UiState.Empty

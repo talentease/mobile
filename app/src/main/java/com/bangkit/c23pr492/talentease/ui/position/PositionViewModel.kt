@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.MainRepository
 import com.bangkit.c23pr492.talentease.data.Resource
-import com.bangkit.c23pr492.talentease.data.model.PositionModel
+import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class PositionViewModel(private val repository: MainRepository) : ViewModel() {
     private val _listPositionState =
-        MutableStateFlow<UiState<List<PositionModel>>>(UiState.Initial)
+        MutableStateFlow<UiState<List<PositionItemModel>>>(UiState.Initial)
     val listPositionState = _listPositionState.asStateFlow()
 
     private val _query = MutableStateFlow("")
@@ -23,9 +23,12 @@ class PositionViewModel(private val repository: MainRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAllPositions(token).collect { resource ->
                 when (resource) {
-                    Resource.Loading -> _listPositionState.emit(UiState.Loading)
+                    is Resource.Loading -> _listPositionState.emit(UiState.Loading)
                     is Resource.Success -> {
-                        _listPositionState.emit(UiState.Success(resource.data))
+                        _listPositionState.emit(
+                            if (resource.data.data.isNullOrEmpty()) UiState.Empty
+                            else UiState.Success(resource.data.data)
+                        )
                     }
                     is Resource.Error -> {
                         _listPositionState.emit(UiState.Error(resource.error))
@@ -40,10 +43,11 @@ class PositionViewModel(private val repository: MainRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.searchPositions(token, newQuery).collect { resource ->
                 when (resource) {
-                    Resource.Loading -> _listPositionState.emit(UiState.Loading)
+                    is Resource.Loading -> _listPositionState.emit(UiState.Loading)
                     is Resource.Success -> {
                         _listPositionState.emit(
-                            if (resource.data.isNotEmpty()) UiState.Success(resource.data) else UiState.Empty
+                            if (resource.data.isNullOrEmpty()) UiState.Empty
+                            else UiState.Success(resource.data)
                         )
                     }
                     is Resource.Error -> {

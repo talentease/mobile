@@ -7,11 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bangkit.c23pr492.talentease.data.model.PositionModel
+import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
 
 @Composable
-fun PositionItems(position: PositionModel, modifier: Modifier = Modifier) {
+fun PositionItems(position: PositionItemModel, modifier: Modifier = Modifier) {
     Card(modifier) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
             SubTitleText(
@@ -34,6 +34,6 @@ fun PositionItems(position: PositionModel, modifier: Modifier = Modifier) {
 @Composable
 fun PositionItemsPreview() {
     TalentEaseTheme {
-        PositionItems(position = PositionModel())
+        PositionItems(position = PositionItemModel())
     }
 }

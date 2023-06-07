@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.model.PositionModel
+import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
@@ -55,7 +55,8 @@ fun PositionScreen(
     navigateToAdd: (String) -> Unit,
 ) {
     val listDataState = positionViewModel.listPositionState.collectAsState()
-    val isLoading by rememberSaveable { mutableStateOf(false) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    LoadingProgressBar(isLoading = isLoading)
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
@@ -64,29 +65,43 @@ fun PositionScreen(
             }
         }
     ) {
-        LoadingProgressBar(isLoading = isLoading, modifier = modifier)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(it).fillMaxSize()
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
         ) {
             SearchBarScreen(token, positionViewModel)
             val listState = rememberLazyGridState()
             listDataState.value.let { state ->
                 when (state) {
-                    UiState.Initial -> positionViewModel.getAllPositions(token)
-                    is UiState.Loading -> CircularProgressIndicator()
-                    is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
-                    is UiState.Success -> PositionContentScreen(
-                        listState,
-                        state.data,
+                    UiState.Initial -> {
+                        isLoading = false
+                        positionViewModel.getAllPositions(token)
+                    }
+                    is UiState.Loading -> isLoading = true
+                    is UiState.Empty -> {
+                        isLoading = false
+                        EmptyContentScreen(R.string.empty_list, modifier)
+                    }
+                    is UiState.Success -> {
+                        isLoading = false
+                        PositionContentScreen(
+                            listState,
+                            state.data,
 //                    navigateToDetail = navigateToDetail
-                    )
-                    is UiState.Error -> Toast.makeText(
-                        LocalContext.current,
-                        state.error.asString(LocalContext.current),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        )
+                    }
+                    is UiState.Error -> {
+                        isLoading = false
+                        Toast.makeText(
+                            LocalContext.current,
+                            state.error.asString(LocalContext.current),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
+                Log.d("position", "PositionScreen: $state")
             }
         }
     }
@@ -140,7 +155,7 @@ fun SearchBarScreen(token: String, positionViewModel: PositionViewModel) {
 @Composable
 fun PositionContentScreen(
     listState: LazyGridState = rememberLazyGridState(),
-    data: List<PositionModel>,
+    data: List<PositionItemModel>,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {

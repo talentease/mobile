@@ -3,7 +3,8 @@ package com.bangkit.c23pr492.talentease.data
 import android.util.Log
 import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
 import com.bangkit.c23pr492.talentease.data.model.ApplicationsData
-import com.bangkit.c23pr492.talentease.data.model.PositionModel
+import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.PositionListModel
 import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const
 import com.bangkit.c23pr492.talentease.utils.UiText
@@ -41,7 +42,7 @@ class MainRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getAllPositions(token: String): Flow<Resource<List<PositionModel>>> = flow {
+    fun getAllPositions(token: String): Flow<Resource<PositionListModel>> = flow {
         emit(Resource.Loading)
         try {
             val response = apiService.getAllPositions(generateBearerToken(token))
@@ -53,19 +54,21 @@ class MainRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun searchPositions(token: String, query: String): Flow<Resource<List<PositionModel>>> = flow {
-        emit(Resource.Loading)
-        try {
-            val response = apiService.getAllPositions(generateBearerToken(token)).filter {
-                it.title?.contains(query, ignoreCase = true) ?: false
+    fun searchPositions(token: String, query: String): Flow<Resource<List<PositionItemModel>?>> =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val response = apiService.getAllPositions(generateBearerToken(token)).data?.toList()
+                    ?.filter {
+                        it.title?.contains(query, ignoreCase = true) ?: false
+                    }
+                Log.d(Const.tagRepository, response.toString())
+                emit(Resource.Success(response))
+            } catch (e: Exception) {
+                Log.e(Const.tagRepository, Log.getStackTraceString(e))
+                emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
             }
-            Log.d(Const.tagRepository, response.toString())
-            emit(Resource.Success(response))
-        } catch (e: Exception) {
-            Log.e(Const.tagRepository, Log.getStackTraceString(e))
-            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
-        }
-    }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO)
 
     private fun generateBearerToken(token: String): String {
         return if (token.contains("bearer", true)) {
