@@ -19,19 +19,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
-import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.component.EmailTextField
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.component.PasswordTextField
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
-import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     authViewModel: AuthViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(LocalContext.current)
+        factory = AuthViewModelFactory.getInstance(LocalContext.current)
     ),
     viewModel: LoginViewModel = viewModel(),
     navigateToHome: (String) -> Unit,
@@ -39,7 +39,7 @@ fun LoginScreen(
 ) {
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = true) {
-        authViewModel.isLogin()
+        authViewModel.prepareEvent()
         authViewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvents.Loading -> isLoading = true

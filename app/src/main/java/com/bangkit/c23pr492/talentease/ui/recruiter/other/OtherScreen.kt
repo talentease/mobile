@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.other
+package com.bangkit.c23pr492.talentease.ui.recruiter.other
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
-import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -21,13 +21,14 @@ fun OtherScreen(
     token: String,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(LocalContext.current)
+        factory = AuthViewModelFactory.getInstance(LocalContext.current)
     ),
     navigateToLogin: (String) -> Unit,
+    navigateToTalent: (String) -> Unit
 ) {
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = true) {
-        authViewModel.isLogin()
+        authViewModel.prepareEvent()
         authViewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvents.Loading -> isLoading = true
@@ -47,6 +48,13 @@ fun OtherScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Button(
+            onClick = {
+                navigateToTalent(token)
+            }
+        ) {
+            Text(text = "Navigate to Talent")
+        }
         Button(
             onClick = {
                 authViewModel.logout()

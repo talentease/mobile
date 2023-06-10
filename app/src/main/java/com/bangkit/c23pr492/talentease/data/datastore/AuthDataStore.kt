@@ -26,8 +26,27 @@ class AuthDataStore private constructor(private val dataStore: DataStore<Prefere
         }
     }
 
+    fun getRole(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[ROLE_KEY]
+        }
+    }
+
+    suspend fun saveRole(role: String) {
+        dataStore.edit { preferences ->
+            preferences[ROLE_KEY] = role
+        }
+    }
+
+    suspend fun clearRole() {
+        dataStore.edit { preferences ->
+            preferences.remove(ROLE_KEY)
+        }
+    }
+
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("token")
+        private val ROLE_KEY = stringPreferencesKey("role")
         @Volatile
         private var INSTANCE: AuthDataStore? = null
         fun getInstance(dataStore: DataStore<Preferences>): AuthDataStore {

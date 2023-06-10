@@ -4,6 +4,8 @@
     <string name="application">Application</string>
     <string name="position">Position</string>
     <string name="other">Other</string>
+    <string name="vacancy">Vacancy</string>
+    <string name="profile">Profile</string>
     <string name="application_page">Application Page</string>
     <string name="position_page">Position Page</string>
     <string name="other_page">Other Page</string>

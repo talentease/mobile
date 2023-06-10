@@ -33,7 +33,7 @@ object ApplicationsData {
         "3 Mei"
     )
 
-    val listData: ArrayList<ApplicationModel>
+    val listApplicationData: ArrayList<ApplicationModel>
         get() {
             val list = arrayListOf<ApplicationModel>()
             var id = 0

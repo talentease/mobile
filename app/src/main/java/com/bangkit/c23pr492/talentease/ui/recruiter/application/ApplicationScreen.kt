@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.application
+package com.bangkit.c23pr492.talentease.ui.application.recruiter
 
 import android.content.Context
 import android.util.Log
@@ -31,31 +31,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationViewModel
 import com.bangkit.c23pr492.talentease.ui.component.ApplicationItems
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.core.UiState
+import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.Const.tagTestList
+import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
-import com.bangkit.c23pr492.talentease.utils.ViewModelFactory
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationScreen(
     token: String,
-    modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
+    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(context)
+        factory = AuthViewModelFactory.getInstance(context)
     ),
     applicationViewModel: ApplicationViewModel = viewModel(
-        factory = ViewModelFactory.getInstance(context)
+        factory = RecruiterViewModelFactory.getInstance(context)
     )
 ) {
     val listDataState = applicationViewModel.listApplicationState.collectAsState()
-    val isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading)
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    LoadingProgressBar(isLoading = isLoading, modifier = modifier)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
@@ -64,19 +65,31 @@ fun ApplicationScreen(
         val listState = rememberLazyListState()
         listDataState.value.let { state ->
             when (state) {
-                UiState.Initial -> applicationViewModel.getLanguages()
-                is UiState.Loading -> CircularProgressIndicator()
-                is UiState.Empty -> EmptyContentScreen(R.string.empty_list, modifier)
-                is UiState.Success -> ApplicationContentScreen(
-                    listState,
-                    state.data,
+                UiState.Initial -> {
+                    isLoading = false
+                    applicationViewModel.getAllApplications()
+                }
+                is UiState.Loading -> isLoading = true
+                is UiState.Empty -> {
+                    isLoading = false
+                    EmptyContentScreen(R.string.empty_list, modifier)
+                }
+                is UiState.Success -> {
+                    isLoading = false
+                    ApplicationContentScreen(
+                        listState,
+                        state.data,
 //                    navigateToDetail = navigateToDetail
-                )
-                is UiState.Error -> Toast.makeText(
-                    LocalContext.current,
-                    state.error.asString(LocalContext.current),
-                    Toast.LENGTH_SHORT
-                ).show()
+                    )
+                }
+                is UiState.Error -> {
+                    isLoading = false
+                    Toast.makeText(
+                        LocalContext.current,
+                        state.error.asString(LocalContext.current),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
@@ -141,7 +154,6 @@ fun ApplicationContentScreen(
             contentPadding = PaddingValues(bottom = 80.dp),
             modifier = modifier.testTag(tagTestList)
         ) {
-            item { }
             items(data, key = { it.id }) { application ->
                 ApplicationItems(
                     application,
@@ -151,6 +163,7 @@ fun ApplicationContentScreen(
 //                    navigateToDetail = navigateToDetail
                 )
             }
+            item { }
         }
         AnimatedVisibility(
             visible = showButton,

@@ -61,7 +61,7 @@ fun ApplicationItems(
                         .fillMaxWidth()
                 )
                 Text(
-                    text = position,
+                    text = "$status / $position",
                     fontWeight = FontWeight.Normal,
                     fontSize = textRegular,
                     maxLines = 2,
