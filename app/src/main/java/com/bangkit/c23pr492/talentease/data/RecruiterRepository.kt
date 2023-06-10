@@ -13,13 +13,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class MainRepository(
+class RecruiterRepository(
     private val apiService: ApiService
 ) {
     fun getAllApplications(): Flow<Resource<List<ApplicationModel>>> = flow {
         emit(Resource.Loading)
         try {
-            val response = ApplicationsData.listData
+            val response = ApplicationsData.listApplicationData
             Log.d(Const.tagRepository, response.toString())
             emit(Resource.Success(response))
         } catch (e: Exception) {
@@ -31,7 +31,7 @@ class MainRepository(
     fun searchApplications(query: String): Flow<Resource<List<ApplicationModel>>> = flow {
         emit(Resource.Loading)
         try {
-            val response = ApplicationsData.listData.filter {
+            val response = ApplicationsData.listApplicationData.filter {
                 it.name.contains(query, ignoreCase = true)
             }
             Log.d(Const.tagRepository, response.toString())
@@ -80,11 +80,11 @@ class MainRepository(
 
     companion object {
         @Volatile
-        private var instance: MainRepository? = null
+        private var instance: RecruiterRepository? = null
         fun getInstance(
             apiService: ApiService
-        ): MainRepository = instance ?: synchronized(this) {
-            instance ?: MainRepository(apiService)
+        ): RecruiterRepository = instance ?: synchronized(this) {
+            instance ?: RecruiterRepository(apiService)
         }.also { instance = it }
     }
 }

@@ -17,20 +17,23 @@ fun SplashScreen(
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory.getInstance(LocalContext.current)
     ),
-    token: (String) -> Unit
+    token: (String) -> Unit,
+    role: (String) -> Unit,
 ) {
     Text(text = "SplashScreen")
     LaunchedEffect(key1 = true) {
         authViewModel.apply {
             getToken()
-            isLogin()
+            getRole()
+            prepareEvent()
             eventFlow.collectLatest { event ->
                 when (event) {
                     is UiEvents.SnackBarEvent -> {}
                     is UiEvents.Loading -> {}
                     is UiEvents.NavigateEvent -> {
+                        token(event.route.substringAfterLast("/"))
+                        role(event.route.substringBefore("/"))
                         navigate(event.route)
-                        token(event.route.substringAfter("/"))
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.position.detail
+package com.bangkit.c23pr492.talentease.ui.recruiter.position.detail
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

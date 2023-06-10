@@ -3,12 +3,12 @@ package com.bangkit.c23pr492.talentease.utils
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.bangkit.c23pr492.talentease.data.MainRepository
+import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.di.Injection
-import com.bangkit.c23pr492.talentease.ui.application.ApplicationViewModel
-import com.bangkit.c23pr492.talentease.ui.position.PositionViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionViewModel
 
-class MainViewModelFactory private constructor(private val repository: MainRepository) :
+class RecruiterViewModelFactory private constructor(private val repository: RecruiterRepository) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -29,9 +29,9 @@ class MainViewModelFactory private constructor(private val repository: MainRepos
 
     companion object {
         @Volatile
-        private var instance: MainViewModelFactory? = null
-        fun getInstance(context: Context): MainViewModelFactory = instance ?: synchronized(this) {
-            instance ?: MainViewModelFactory(Injection.provideMainRepository(context))
+        private var instance: RecruiterViewModelFactory? = null
+        fun getInstance(context: Context): RecruiterViewModelFactory = instance ?: synchronized(this) {
+            instance ?: RecruiterViewModelFactory(Injection.provideRecruiterRepository(context))
         }.also { instance = it }
     }
 }

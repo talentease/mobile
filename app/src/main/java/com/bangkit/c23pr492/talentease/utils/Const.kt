@@ -5,5 +5,6 @@ object Const {
     const val tagRepository = "Repository"
     const val tagTestList = "testList"
     const val authGraphRoute = "auth"
-    const val mainGraphRoute = "main"
+    const val recruiterGraphRoute = "recruiter"
+    const val talentGraphRoute = "talent"
 }

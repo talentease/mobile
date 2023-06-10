@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.position
+package com.bangkit.c23pr492.talentease.ui.application.recruiter
 
 import android.content.Context
 import android.util.Log
@@ -8,10 +8,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
@@ -27,97 +29,81 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationViewModel
+import com.bangkit.c23pr492.talentease.ui.component.ApplicationItems
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
-import com.bangkit.c23pr492.talentease.ui.component.PositionItems
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
-import com.bangkit.c23pr492.talentease.utils.Const
-import com.bangkit.c23pr492.talentease.utils.Const.tagRepository
-import com.bangkit.c23pr492.talentease.utils.MainViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.Const.tagTestList
+import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
 import kotlinx.coroutines.launch
 
 @Composable
-fun PositionScreen(
+fun ApplicationScreen(
     token: String,
-    modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
+    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory.getInstance(context)
     ),
-    positionViewModel: PositionViewModel = viewModel(
-        factory = MainViewModelFactory.getInstance(context)
-    ),
-    navigateToDetail: (String) -> Unit,
-    navigateToAdd: (String) -> Unit,
+    applicationViewModel: ApplicationViewModel = viewModel(
+        factory = RecruiterViewModelFactory.getInstance(context)
+    )
 ) {
-    val listDataState = positionViewModel.listPositionState.collectAsState()
+    val listDataState = applicationViewModel.listApplicationState.collectAsState()
     var isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading)
-    Scaffold(
-        modifier = modifier,
-        floatingActionButton = {
-            FloatingActionButton(onClick = { navigateToAdd(token) }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add a new position")
-            }
-        }
+    LoadingProgressBar(isLoading = isLoading, modifier = modifier)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize()
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-        ) {
-            SearchBarScreen(token, positionViewModel)
-            val listState = rememberLazyGridState()
-            listDataState.value.let { state ->
-                when (state) {
-                    UiState.Initial -> {
-                        isLoading = false
-                        positionViewModel.getAllPositions(token)
-                    }
-                    is UiState.Loading -> isLoading = true
-                    is UiState.Empty -> {
-                        isLoading = false
-                        EmptyContentScreen(R.string.empty_list, modifier)
-                    }
-                    is UiState.Success -> {
-                        isLoading = false
-                        PositionContentScreen(
-                            listState,
-                            state.data,
-//                    navigateToDetail = navigateToDetail
-                        )
-                    }
-                    is UiState.Error -> {
-                        isLoading = false
-                        Toast.makeText(
-                            LocalContext.current,
-                            state.error.asString(LocalContext.current),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+        SearchBarScreen(applicationViewModel)
+        val listState = rememberLazyListState()
+        listDataState.value.let { state ->
+            when (state) {
+                UiState.Initial -> {
+                    isLoading = false
+                    applicationViewModel.getAllApplications()
                 }
-                Log.d("position", "PositionScreen: $state")
+                is UiState.Loading -> isLoading = true
+                is UiState.Empty -> {
+                    isLoading = false
+                    EmptyContentScreen(R.string.empty_list, modifier)
+                }
+                is UiState.Success -> {
+                    isLoading = false
+                    ApplicationContentScreen(
+                        listState,
+                        state.data,
+//                    navigateToDetail = navigateToDetail
+                    )
+                }
+                is UiState.Error -> {
+                    isLoading = false
+                    Toast.makeText(
+                        LocalContext.current,
+                        state.error.asString(LocalContext.current),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
-    Log.d("token", "PositionScreen: $token")
+    Log.d("token", "ApplicationScreen: $token")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBarScreen(token: String, positionViewModel: PositionViewModel) {
-    val query by positionViewModel.query.collectAsState()
+fun SearchBarScreen(applicationViewModel: ApplicationViewModel) {
+    val query by applicationViewModel.query.collectAsState()
     var active by rememberSaveable { mutableStateOf(false) }
     SearchBar(
         query = query,
-        onQueryChange = {
-            positionViewModel.searchPositions(token = token, newQuery = it)
-        },
+        onQueryChange = applicationViewModel::searchApplications,
         onSearch = {
             active = false
         },
@@ -138,7 +124,7 @@ fun SearchBarScreen(token: String, positionViewModel: PositionViewModel) {
                     contentDescription = "Search Icon",
                     modifier = Modifier.clickable {
                         if (query.isNotEmpty()) {
-                            positionViewModel.searchPositions(token = token, newQuery = "")
+                            applicationViewModel.searchApplications("")
                         } else {
                             active = false
                         }
@@ -153,33 +139,29 @@ fun SearchBarScreen(token: String, positionViewModel: PositionViewModel) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PositionContentScreen(
-    listState: LazyGridState = rememberLazyGridState(),
-    data: List<PositionItemModel>,
+fun ApplicationContentScreen(
+    listState: LazyListState = rememberLazyListState(),
+    data: List<ApplicationModel>,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
         val scope = rememberCoroutineScope()
         val showButton: Boolean by remember {
-            derivedStateOf { listState.firstVisibleItemIndex > 2 }
+            derivedStateOf { listState.firstVisibleItemIndex > 1 }
         }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        LazyColumn(
             state = listState,
             contentPadding = PaddingValues(bottom = 80.dp),
-            modifier = Modifier
-                .padding(all = 8.dp)
-                .testTag(Const.tagTestList)
+            modifier = modifier.testTag(tagTestList)
         ) {
-            items(data, key = { it.id }) { position ->
-                PositionItems(
-                    position,
+            items(data, key = { it.id }) { application ->
+                ApplicationItems(
+                    application,
                     modifier = modifier
-                        .padding(all = 8.dp)
+                        .fillMaxWidth()
                         .animateItemPlacement(tween(durationMillis = 100)),
 //                    navigateToDetail = navigateToDetail
                 )
-                Log.d(tagRepository, "PositionContentScreen: berhitung 123")
             }
             item { }
         }

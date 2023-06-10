@@ -6,20 +6,21 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.bangkit.c23pr492.talentease.ui.application.ApplicationScreen
-import com.bangkit.c23pr492.talentease.ui.other.OtherScreen
-import com.bangkit.c23pr492.talentease.ui.position.PositionScreen
-import com.bangkit.c23pr492.talentease.ui.position.add.AddPositionScreen
-import com.bangkit.c23pr492.talentease.ui.position.detail.DetailPositionScreen
-import com.bangkit.c23pr492.talentease.utils.Const.mainGraphRoute
+import com.bangkit.c23pr492.talentease.ui.application.recruiter.ApplicationScreen
+import com.bangkit.c23pr492.talentease.ui.recruiter.other.OtherScreen
+import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionScreen
+import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionScreen
+import com.bangkit.c23pr492.talentease.ui.recruiter.position.detail.DetailPositionScreen
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
+import com.bangkit.c23pr492.talentease.utils.Const.recruiterGraphRoute
 
-fun NavGraphBuilder.mainNavGraph(
-    navController: NavHostController
+fun NavGraphBuilder.recruiterNavGraph(
+    navController: NavHostController,
+    role: (String) -> Unit
 ) {
     navigation(
         startDestination = Screen.Application.route,
-        route = mainGraphRoute
+        route = recruiterGraphRoute
     ) {
         composable(
             route = Screen.Application.route,
@@ -54,10 +55,14 @@ fun NavGraphBuilder.mainNavGraph(
                 token = token,
                 navigateToLogin = { route ->
                     navController.navigate(route) {
-                        popUpTo(mainGraphRoute) {
+                        popUpTo(recruiterGraphRoute) {
                             inclusive = true
                         }
                     }
+                },
+                navigateToTalent = { navToken ->
+                    navController.navigate(Screen.Vacancy.createRoute(navToken))
+                    role("talent")
                 }
             )
         }

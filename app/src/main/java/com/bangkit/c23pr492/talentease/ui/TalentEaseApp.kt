@@ -2,9 +2,7 @@ package com.bangkit.c23pr492.talentease.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,10 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.ui.navigation.NavigationItem
-import com.bangkit.c23pr492.talentease.ui.navigation.Screen
-import com.bangkit.c23pr492.talentease.ui.navigation.authNavGraph
-import com.bangkit.c23pr492.talentease.ui.navigation.mainNavGraph
+import com.bangkit.c23pr492.talentease.ui.navigation.*
 
 @Composable
 fun TalentEaseApp(
@@ -33,14 +28,18 @@ fun TalentEaseApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var token by rememberSaveable { mutableStateOf("") }
+    var role by rememberSaveable { mutableStateOf("") }
     val strings: MutableSet<String> = HashSet()
     strings.add(Screen.Application.route)
     strings.add(Screen.Position.route)
     strings.add(Screen.Other.route)
+    strings.add(Screen.Vacancy.route)
+    strings.add(Screen.TalentApplication.route)
+    strings.add(Screen.Profile.route)
     Scaffold(
         bottomBar = {
             if (strings.contains(currentRoute)) {
-                BottomBar(navController, token)
+                BottomBar(navController, token, role)
             }
         }
     ) {
@@ -60,11 +59,17 @@ fun TalentEaseApp(
                     },
                     token = { value ->
                         token = value
+                    },
+                    role = { value ->
+                        role = value
                     }
                 )
             }
             authNavGraph(navController)
-            mainNavGraph(navController)
+            recruiterNavGraph(navController,role = { value ->
+                role = value
+            })
+            talentNavGraph(navController)
         }
     }
 }
@@ -73,30 +78,62 @@ fun TalentEaseApp(
 private fun BottomBar(
     navController: NavHostController,
     token: String,
+    role: String
 ) {
-    val navigationItems = listOf(
-        NavigationItem(
-            title = stringResource(id = R.string.application),
-            icon = Icons.Default.Person,
-            screen = Screen.Application,
-            routeWithToken = Screen.Application.createRoute(token),
-            contentDesc = stringResource(R.string.application)
-        ),
-        NavigationItem(
-            title = stringResource(R.string.position),
-            icon = Icons.Default.Groups,
-            screen = Screen.Position,
-            routeWithToken = Screen.Position.createRoute(token),
-            contentDesc = stringResource(R.string.position_page)
-        ),
-        NavigationItem(
-            title = stringResource(R.string.other),
-            icon = Icons.Default.AccountCircle,
-            screen = Screen.Other,
-            routeWithToken = Screen.Other.createRoute(token),
-            contentDesc = stringResource(R.string.other_page)
-        ),
-    )
+    var navigationItems: List<NavigationItem> = emptyList()
+    when (role) {
+        "recruiter" -> {
+            navigationItems = listOf(
+                NavigationItem(
+                    title = stringResource(R.string.application),
+                    icon = Icons.Default.Person,
+                    screen = Screen.Application,
+                    routeWithToken = Screen.Application.createRoute(token),
+                    contentDesc = stringResource(R.string.application)
+                ),
+                NavigationItem(
+                    title = stringResource(R.string.position),
+                    icon = Icons.Default.Groups,
+                    screen = Screen.Position,
+                    routeWithToken = Screen.Position.createRoute(token),
+                    contentDesc = stringResource(R.string.position_page)
+                ),
+                NavigationItem(
+                    title = stringResource(R.string.other),
+                    icon = Icons.Default.AccountCircle,
+                    screen = Screen.Other,
+                    routeWithToken = Screen.Other.createRoute(token),
+                    contentDesc = stringResource(R.string.other_page)
+                )
+            )
+        }
+        "talent" -> {
+            navigationItems = listOf(
+                NavigationItem(
+                    title = stringResource(R.string.vacancy),
+                    icon = Icons.Default.Dashboard,
+                    screen = Screen.Vacancy,
+                    routeWithToken = Screen.Vacancy.createRoute(token),
+                    contentDesc = stringResource(R.string.vacancy)
+                ),
+                NavigationItem(
+                    title = stringResource(R.string.application),
+                    icon = Icons.Default.ListAlt,
+                    screen = Screen.Application,
+                    routeWithToken = Screen.Application.createRoute(token),
+                    contentDesc = stringResource(R.string.application)
+                ),
+                NavigationItem(
+                    title = stringResource(R.string.profile),
+                    icon = Icons.Default.AccountCircle,
+                    screen = Screen.Profile,
+                    routeWithToken = Screen.Profile.createRoute(token),
+                    contentDesc = stringResource(R.string.profile)
+                )
+            )
+        }
+    }
+
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route

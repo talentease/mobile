@@ -39,7 +39,7 @@ fun LoginScreen(
 ) {
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = true) {
-        authViewModel.isLogin()
+        authViewModel.prepareEvent()
         authViewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is UiEvents.Loading -> isLoading = true

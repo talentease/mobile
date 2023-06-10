@@ -27,6 +27,32 @@ class AuthRepository(
         authDataStore.clearToken()
     }
 
+    fun getRole(): Flow<String?> = authDataStore.getRole()
+
+    suspend fun saveRole(role: String) {
+        authDataStore.saveRole(role)
+    }
+
+    private suspend fun clearRole() {
+        authDataStore.clearRole()
+    }
+
+    fun checkRole(token: String): Flow<Resource<String>> = flow {
+        emit(Resource.Loading)
+        try {
+            Log.d(tagRepository, "checkRole: $token")
+            val response = "recruiter"
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            if (e.message.isNullOrBlank()) {
+                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
+            } else {
+                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
+            }
+        }
+    }
+
     fun loginUser(email: String, password: String): Flow<Resource<FirebaseUser?>> = flow {
         emit(Resource.Loading)
         try {

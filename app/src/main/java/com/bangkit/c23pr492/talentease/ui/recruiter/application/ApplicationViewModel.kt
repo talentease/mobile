@@ -1,8 +1,8 @@
-package com.bangkit.c23pr492.talentease.ui.application
+package com.bangkit.c23pr492.talentease.ui.recruiter.application
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bangkit.c23pr492.talentease.data.MainRepository
+import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.data.Resource
 import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
 import com.bangkit.c23pr492.talentease.ui.core.UiState
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ApplicationViewModel(private val repository: MainRepository) : ViewModel() {
+class ApplicationViewModel(private val repository: RecruiterRepository) : ViewModel() {
     private val _listApplicationState =
         MutableStateFlow<UiState<List<ApplicationModel>>>(UiState.Initial)
     val listApplicationState = _listApplicationState.asStateFlow()
