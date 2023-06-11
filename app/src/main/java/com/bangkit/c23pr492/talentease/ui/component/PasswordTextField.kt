@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.ui.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -18,32 +19,34 @@ import com.bangkit.c23pr492.talentease.utils.autofill
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PasswordTextField(viewModel: TextFieldViewModel) {
-    TextField(
-        value = viewModel.password,
-        onValueChange = {
-            viewModel.updatePassword(it)
-        },
-        placeholder = {
-            Text(text = "Password")
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Filled.Lock,
-                contentDescription = null
-            )
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
-        singleLine = true,
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier
-            .autofill(
-                autofillTypes = listOf(AutofillType.Password),
-                onFill = { viewModel.updatePassword(it) }
-            )
-            .fillMaxWidth()
-    )
+fun PasswordTextField(viewModel: AuthTextFieldViewModel) {
+    Box {
+        TextField(
+            value = viewModel.password,
+            onValueChange = {
+                viewModel.updatePassword(it)
+            },
+            placeholder = {
+                Text(text = "Password")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Lock,
+                    contentDescription = null
+                )
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier
+                .autofill(
+                    autofillTypes = listOf(AutofillType.Password),
+                    onFill = { viewModel.updatePassword(it) }
+                )
+                .fillMaxWidth()
+        )
+    }
 }

@@ -7,6 +7,7 @@ import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.di.Injection
 import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationViewModel
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionViewModel
 
 class RecruiterViewModelFactory private constructor(private val repository: RecruiterRepository) :
     ViewModelProvider.NewInstanceFactory() {
@@ -17,6 +18,9 @@ class RecruiterViewModelFactory private constructor(private val repository: Recr
                 repository
             ) as T
             modelClass.isAssignableFrom(PositionViewModel::class.java) -> return PositionViewModel(
+                repository
+            ) as T
+            modelClass.isAssignableFrom(AddPositionViewModel::class.java) -> return AddPositionViewModel(
                 repository
             ) as T
 //            modelClass.isAssignableFrom(DetailViewModel::class.java) -> return DetailViewModel(repository) as T

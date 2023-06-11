@@ -25,7 +25,19 @@ data class PositionEntity(
 
     @ColumnInfo(name = "salary")
     val positionSalary: String,
-)
+) {
+    companion object {
+        val position1 = PositionEntity(
+            "1",
+            "Associate Software Engineer",
+            "Develop, collaborate, and fix software issues. Requires a Bachelor's degree in Computer Science or related field, proficiency in back-end programming languages, and strong problem-solving skills. Join our team for impactful software development.",
+            "WFO",
+            "1",
+            "End of the world 💀",
+            "6000000"
+        )
+    }
+}
 
 data class PositionWithCompany(
     @Embedded

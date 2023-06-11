@@ -19,7 +19,17 @@ data class ApplicationEntity(
 
     @ColumnInfo(name = "talentId")
     val talentId: String,
-)
+) {
+    companion object {
+        val application1 = ApplicationEntity(
+            "1",
+            "pending",
+            "1",
+            "1",
+            "1"
+        )
+    }
+}
 
 data class ApplicationWithTalentAndPositionAndCompany(
     @Embedded
@@ -28,15 +38,15 @@ data class ApplicationWithTalentAndPositionAndCompany(
         parentColumn = "talentId",
         entityColumn = "talentId"
     )
-    val talent: TalentEntity? = null,
+    val talent: TalentEntity,
     @Relation(
         parentColumn = "positionId",
         entityColumn = "positionId"
     )
-    val position: PositionEntity? = null,
+    val position: PositionEntity,
     @Relation(
         parentColumn = "companyId",
         entityColumn = "companyId"
     )
-    val company: CompanyEntity? = null,
+    val company: CompanyEntity
 )

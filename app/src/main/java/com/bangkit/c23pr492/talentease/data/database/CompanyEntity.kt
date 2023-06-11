@@ -16,7 +16,16 @@ data class CompanyEntity(
 
     @ColumnInfo(name = "description")
     val companyDescription: String,
-)
+) {
+    companion object {
+        val company1 = CompanyEntity(
+            "1",
+            "Google Indonesia",
+            "SCBD, Pacific Century Place Tower Level 45, Jl. Jenderal Sudirman No.53, RT.5/RW.3, Senayan, Kebayoran Baru, South Jakarta City, Jakarta 12190",
+            "Google LLC is an American multinational technology company focusing on artificial intelligence, online advertising, search engine technology, cloud computing, computer software, quantum computing, e-commerce, and consumer electronics.",
+        )
+    }
+}
 
 data class CompanyWithApplication(
     @Embedded

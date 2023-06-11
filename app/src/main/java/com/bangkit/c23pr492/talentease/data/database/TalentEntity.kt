@@ -26,16 +26,29 @@ data class TalentEntity(
     val talentContact: String,
 
     @ColumnInfo(name = "experience")
-    val talentExperience: String,
+    val talentExperience: String?,
 
     @ColumnInfo(name = "education")
-    val talentEducation: String,
+    val talentEducation: String?,
 
     @ColumnInfo(name = "award")
-    val talentAward: String,
+    val talentAward: String?,
 
     @ColumnInfo(name = "certificate")
-    val talentCertificate: String,
+    val talentCertificate: String?,
 ) {
-
+    companion object {
+        val talent1 = TalentEntity(
+            "1",
+            "John",
+            "20",
+            "Male",
+            "Sleman",
+            "John@gmail.com",
+            "1 Year as a Software Engineer at META",
+            "Bachelor's degree, Computer Science at UBLO",
+            null,
+            "Belajar Fundamental Aplikasi Android"
+        )
+    }
 }

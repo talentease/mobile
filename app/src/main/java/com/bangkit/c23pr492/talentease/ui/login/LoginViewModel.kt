@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
-import com.bangkit.c23pr492.talentease.ui.component.TextFieldViewModel
+import com.bangkit.c23pr492.talentease.ui.component.AuthTextFieldViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginViewModel : TextFieldViewModel() {
+class LoginViewModel : AuthTextFieldViewModel() {
     override var email by mutableStateOf("")
         private set
 

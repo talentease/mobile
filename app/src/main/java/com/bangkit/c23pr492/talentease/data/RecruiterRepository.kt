@@ -1,6 +1,8 @@
 package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
+import com.bangkit.c23pr492.talentease.data.database.PositionEntity
+import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
 import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
 import com.bangkit.c23pr492.talentease.data.model.ApplicationsData
 import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
@@ -14,7 +16,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 class RecruiterRepository(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val mTalentEaseDao: TalentEaseDao
 ) {
     fun getAllApplications(): Flow<Resource<List<ApplicationModel>>> = flow {
         emit(Resource.Loading)
@@ -70,6 +73,14 @@ class RecruiterRepository(
             }
         }.flowOn(Dispatchers.IO)
 
+    suspend fun addPosition(position: PositionEntity) {
+        mTalentEaseDao.upsertPosition(position)
+    }
+
+    suspend fun removePosition(position: PositionEntity) {
+        mTalentEaseDao.deletePosition(position)
+    }
+
     private fun generateBearerToken(token: String): String {
         return if (token.contains("bearer", true)) {
             token
@@ -82,9 +93,10 @@ class RecruiterRepository(
         @Volatile
         private var instance: RecruiterRepository? = null
         fun getInstance(
-            apiService: ApiService
+            apiService: ApiService,
+            mTalentEaseDao: TalentEaseDao
         ): RecruiterRepository = instance ?: synchronized(this) {
-            instance ?: RecruiterRepository(apiService)
+            instance ?: RecruiterRepository(apiService, mTalentEaseDao)
         }.also { instance = it }
     }
 }
