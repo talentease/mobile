@@ -111,7 +111,7 @@ fun SearchBarScreen(vacancyViewModel: VacancyViewModel) {
             active = it
         },
         placeholder = {
-            Text(text = "Search talent's name")
+            Text(text = "Search your dream job")
         },
         leadingIcon = {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")

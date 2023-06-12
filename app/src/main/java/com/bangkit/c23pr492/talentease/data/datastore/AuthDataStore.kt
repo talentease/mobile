@@ -44,9 +44,28 @@ class AuthDataStore private constructor(private val dataStore: DataStore<Prefere
         }
     }
 
+    fun getTalentId(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[TALENT_KEY]
+        }
+    }
+
+    suspend fun saveTalentId(talentId: String) {
+        dataStore.edit { preferences ->
+            preferences[TALENT_KEY] = talentId
+        }
+    }
+
+    suspend fun clearTalentId() {
+        dataStore.edit { preferences ->
+            preferences.remove(TALENT_KEY)
+        }
+    }
+
     companion object {
         private val TOKEN_KEY = stringPreferencesKey("token")
         private val ROLE_KEY = stringPreferencesKey("role")
+        private val TALENT_KEY = stringPreferencesKey("talent")
         @Volatile
         private var INSTANCE: AuthDataStore? = null
         fun getInstance(dataStore: DataStore<Preferences>): AuthDataStore {

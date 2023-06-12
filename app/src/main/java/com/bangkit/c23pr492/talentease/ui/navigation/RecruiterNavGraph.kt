@@ -61,8 +61,12 @@ fun NavGraphBuilder.recruiterNavGraph(
                     }
                 },
                 navigateToTalent = { navToken ->
-                    navController.navigate(Screen.Vacancy.createRoute(navToken))
                     role("talent")
+                    navController.navigate(Screen.Vacancy.createRoute(navToken)) {
+                        popUpTo(recruiterGraphRoute) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }

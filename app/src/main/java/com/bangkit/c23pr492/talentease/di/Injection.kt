@@ -34,7 +34,8 @@ object Injection {
         val database = TalentEaseDatabase.getDatabase(context)
         val dao = database.talentEaseDao()
         return TalentRepository.getInstance(
-            dao
+            dao,
+            AuthDataStore.getInstance(context.dataStore)
         )
     }
 }

@@ -33,4 +33,8 @@ class DetailVacancyViewModel(private val repository: TalentRepository) : ViewMod
             }
         }
     }
+
+    fun applyApplication() = viewModelScope.launch(Dispatchers.IO) {
+        repository.applyApplication()
+    }
 }

@@ -57,6 +57,7 @@ fun DetailVacancyScreen(
                 DetailVacancyContentScreen(
                     token,
                     state.data,
+                    detailVacancyViewModel,
                     navigateToApplication
                 )
             }
@@ -76,6 +77,7 @@ fun DetailVacancyScreen(
 fun DetailVacancyContentScreen(
     token: String,
     position: PositionWithCompany,
+    detailVacancyViewModel: DetailVacancyViewModel,
     navigateToApplication: (String) -> Unit
 ) {
     Column(
@@ -101,7 +103,12 @@ fun DetailVacancyContentScreen(
                 Text(text = position.position.positionDescription)
             }
         }
-        Button(onClick = { navigateToApplication(token) }) {
+        Button(
+            onClick = {
+                detailVacancyViewModel.applyApplication()
+                navigateToApplication(token)
+            }
+        ) {
             Text(text = "Apply Now")
         }
     }
