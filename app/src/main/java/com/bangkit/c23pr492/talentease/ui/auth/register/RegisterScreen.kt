@@ -1,4 +1,4 @@
-package com.bangkit.c23pr492.talentease.ui.register
+package com.bangkit.c23pr492.talentease.ui.auth.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

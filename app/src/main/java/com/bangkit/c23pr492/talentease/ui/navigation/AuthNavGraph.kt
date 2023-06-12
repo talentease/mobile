@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.bangkit.c23pr492.talentease.ui.login.LoginScreen
-import com.bangkit.c23pr492.talentease.ui.register.RegisterScreen
+import com.bangkit.c23pr492.talentease.ui.auth.login.LoginScreen
+import com.bangkit.c23pr492.talentease.ui.auth.register.RegisterScreen
 import com.bangkit.c23pr492.talentease.utils.Const.authGraphRoute
 
 fun NavGraphBuilder.authNavGraph(

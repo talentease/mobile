@@ -119,8 +119,8 @@ private fun BottomBar(
                 NavigationItem(
                     title = stringResource(R.string.application),
                     icon = Icons.Default.ListAlt,
-                    screen = Screen.Application,
-                    routeWithToken = Screen.Application.createRoute(token),
+                    screen = Screen.TalentApplication,
+                    routeWithToken = Screen.TalentApplication.createRoute(token),
                     contentDesc = stringResource(R.string.application)
                 ),
                 NavigationItem(

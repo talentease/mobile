@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bangkit.c23pr492.talentease.data.TalentRepository
 import com.bangkit.c23pr492.talentease.di.Injection
 import com.bangkit.c23pr492.talentease.ui.talent.vacancy.VacancyViewModel
+import com.bangkit.c23pr492.talentease.ui.talent.vacancy.detail.DetailVacancyViewModel
 
 class TalentViewModelFactory private constructor(private val repository: TalentRepository) :
     ViewModelProvider.NewInstanceFactory() {
@@ -13,6 +14,9 @@ class TalentViewModelFactory private constructor(private val repository: TalentR
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         when {
             modelClass.isAssignableFrom(VacancyViewModel::class.java) -> return VacancyViewModel(
+                repository
+            ) as T
+            modelClass.isAssignableFrom(DetailVacancyViewModel::class.java) -> return DetailVacancyViewModel(
                 repository
             ) as T
         }

@@ -1,6 +1,7 @@
 package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
+import com.bangkit.c23pr492.talentease.data.database.CompanyEntity
 import com.bangkit.c23pr492.talentease.data.database.PositionEntity
 import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
 import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
@@ -23,6 +24,7 @@ class RecruiterRepository(
         emit(Resource.Loading)
         try {
             val response = ApplicationsData.listApplicationData
+            addCompany(CompanyEntity.company1)
             Log.d(Const.tagRepository, response.toString())
             emit(Resource.Success(response))
         } catch (e: Exception) {
@@ -79,6 +81,14 @@ class RecruiterRepository(
 
     suspend fun removePosition(position: PositionEntity) {
         mTalentEaseDao.deletePosition(position)
+    }
+
+    suspend fun addCompany(company: CompanyEntity) {
+        mTalentEaseDao.upsertCompany(company)
+    }
+
+    suspend fun removeCompany(company: CompanyEntity) {
+        mTalentEaseDao.upsertCompany(company)
     }
 
     private fun generateBearerToken(token: String): String {

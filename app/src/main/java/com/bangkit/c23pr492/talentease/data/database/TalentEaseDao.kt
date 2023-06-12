@@ -50,6 +50,17 @@ interface TalentEaseDao {
     @Delete
     suspend fun deleteTalent(talent: TalentEntity)
 
+    @Transaction
+    @Query("SELECT * from tb_position")
+    fun getAllPosition(): Flow<List<PositionWithCompany>>
+
+    @Transaction
+    @Query("SELECT * from tb_position WHERE tb_position.name LIKE :query")
+    fun searchPositionsFromName(query: String): Flow<List<PositionWithCompany>>
+
+    @Transaction
+    @Query("SELECT * from tb_position WHERE tb_position.positionId = :companyId")
+    fun getPositionWithPositionId(companyId: String): Flow<PositionWithCompany>
 
 
 //    @Query("SELECT * FROM contact ORDER BY firstName ASC")

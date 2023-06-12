@@ -1,9 +1,9 @@
-package com.bangkit.c23pr492.talentease.ui.login
+package com.bangkit.c23pr492.talentease.ui.auth.register
 
 import android.util.Patterns
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.ui.component.AuthTextFieldViewModel
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LoginViewModel : AuthTextFieldViewModel() {
+class RegisterViewModel : AuthTextFieldViewModel() {
     override var email by mutableStateOf("")
         private set
 
