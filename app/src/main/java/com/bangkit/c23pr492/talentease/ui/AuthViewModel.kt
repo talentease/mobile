@@ -28,6 +28,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     init {
         getToken()
         getRole()
+        prepareEvent()
     }
 
     fun prepareEvent() = viewModelScope.launch(Dispatchers.IO) {

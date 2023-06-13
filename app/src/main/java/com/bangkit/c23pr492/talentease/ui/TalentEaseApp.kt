@@ -29,13 +29,15 @@ fun TalentEaseApp(
     val currentRoute = navBackStackEntry?.destination?.route
     var token by rememberSaveable { mutableStateOf("") }
     var role by rememberSaveable { mutableStateOf("") }
-    val strings: MutableSet<String> = HashSet()
-    strings.add(Screen.Application.route)
-    strings.add(Screen.Position.route)
-    strings.add(Screen.Other.route)
-    strings.add(Screen.Vacancy.route)
-    strings.add(Screen.TalentApplication.route)
-    strings.add(Screen.Profile.route)
+    val strings: Set<String> = hashSetOf(
+        Screen.Application.route,
+        Screen.Position.route,
+        Screen.Other.route,
+        Screen.Vacancy.route,
+        Screen.TalentApplication.route,
+        Screen.Profile.route
+    )
+
     Scaffold(
         bottomBar = {
             if (strings.contains(currentRoute)) {

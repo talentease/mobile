@@ -1,12 +1,8 @@
 package com.bangkit.c23pr492.talentease.ui
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
@@ -24,7 +20,7 @@ fun SplashScreen(
     LaunchedEffect(key1 = true) {
         authViewModel.apply {
             getToken()
-//            getRole()
+            getRole()
             prepareEvent()
             eventFlow.collectLatest { event ->
                 when (event) {
