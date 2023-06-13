@@ -23,7 +23,7 @@ import com.bangkit.c23pr492.talentease.ui.values.textRegular
 fun ApplicationItems(
     application: ApplicationModel,
     modifier: Modifier = Modifier,
-//    navigateToDetail: (Int) -> Unit,
+    navigateToDetail: (String) -> Unit,
 ) {
     application.apply {
         Row(
@@ -38,7 +38,7 @@ fun ApplicationItems(
                     }
                 )
                 .clickable {
-//                    navigateToDetail(id)
+                    navigateToDetail("")
                 }
                 .padding(spacingRegular)
         ) {

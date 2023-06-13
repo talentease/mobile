@@ -17,7 +17,7 @@ sealed class Screen(val route: String) {
     object Other : Screen("recruiter/other/{$navKeyToken}") {
         fun createRoute(token: String) = "recruiter/other/$token"
     }
-    object DetailApplication : Screen("recruiter/application/detail/{$navKeyToken}") {
+    object DetailRecruiterApplication : Screen("recruiter/application/detail/{$navKeyToken}") {
         fun createRoute(token: String) = "recruiter/application/detail/$token"
     }
     object DetailPosition : Screen("recruiter/position/detail/{$navKeyToken}") {

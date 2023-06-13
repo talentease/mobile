@@ -6,7 +6,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.bangkit.c23pr492.talentease.ui.application.recruiter.ApplicationScreen
+import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationScreen
+import com.bangkit.c23pr492.talentease.ui.recruiter.application.detail.DetailRecruiterApplicationScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.other.OtherScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionScreen
@@ -29,6 +30,9 @@ fun NavGraphBuilder.recruiterNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             ApplicationScreen(
                 token = token,
+                navigateToDetail = { navToken ->
+                    navController.navigate(Screen.DetailRecruiterApplication.createRoute(navToken))
+                }
             )
         }
         composable(
@@ -38,8 +42,8 @@ fun NavGraphBuilder.recruiterNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             PositionScreen(
                 token = token,
-                navigateToDetail = { route ->
-                    navController.navigate(route)
+                navigateToDetail = { navToken ->
+                    navController.navigate(navToken)
                 },
                 navigateToAdd = { navToken ->
                     navController.navigate(Screen.AddPosition.createRoute(navToken))
@@ -68,6 +72,15 @@ fun NavGraphBuilder.recruiterNavGraph(
                         }
                     }
                 }
+            )
+        }
+        composable(
+            route = Screen.DetailRecruiterApplication.route,
+            arguments = listOf(navArgument(navKeyToken) { type = NavType.StringType }),
+        ) {
+            val token = it.arguments?.getString(navKeyToken) ?: ""
+            DetailRecruiterApplicationScreen(
+                token = token,
             )
         }
         composable(
