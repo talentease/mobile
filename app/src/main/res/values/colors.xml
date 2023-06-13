@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="md_theme_light_onSurfaceVariant">#FF44474F</color>
     <color name="md_theme_dark_onSurfaceVariant">#FFC4C6D0</color>
+    <color name="first">#0F172A</color>
+    <color name="second">#0E1D3F</color>
 </resources>

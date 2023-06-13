@@ -1,10 +1,12 @@
 package com.bangkit.c23pr492.talentease.ui
 
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
@@ -12,7 +14,6 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SplashScreen(
-    modifier: Modifier = Modifier,
     navigate: (String) -> Unit,
     authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory.getInstance(LocalContext.current)
@@ -20,11 +21,10 @@ fun SplashScreen(
     token: (String) -> Unit,
     role: (String) -> Unit,
 ) {
-    Text(text = "SplashScreen")
     LaunchedEffect(key1 = true) {
         authViewModel.apply {
             getToken()
-            getRole()
+//            getRole()
             prepareEvent()
             eventFlow.collectLatest { event ->
                 when (event) {

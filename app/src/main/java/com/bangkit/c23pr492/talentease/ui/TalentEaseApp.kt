@@ -66,7 +66,7 @@ fun TalentEaseApp(
                 )
             }
             authNavGraph(navController)
-            recruiterNavGraph(navController,role = { value ->
+            recruiterNavGraph(navController, role = { value ->
                 role = value
             })
             talentNavGraph(navController)
