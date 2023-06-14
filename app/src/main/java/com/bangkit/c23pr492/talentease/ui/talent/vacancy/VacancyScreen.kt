@@ -227,7 +227,7 @@ fun VacancyItems(
         }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
-            SubTitleText(
+            TitleText(
                 string = vacancy.title ?: "",
                 modifier = Modifier.padding(bottom = 12.dp)
             )

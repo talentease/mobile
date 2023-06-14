@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.ui.navigation
 
+import android.util.Log
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -12,6 +13,7 @@ import com.bangkit.c23pr492.talentease.ui.recruiter.other.OtherScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.detail.DetailPositionScreen
+import com.bangkit.c23pr492.talentease.utils.Const.navKeyPosition
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
 import com.bangkit.c23pr492.talentease.utils.Const.recruiterGraphRoute
 
@@ -42,8 +44,9 @@ fun NavGraphBuilder.recruiterNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             PositionScreen(
                 token = token,
-                navigateToDetail = { navToken ->
-                    navController.navigate(navToken)
+                navigateToDetail = { navToken, navPosition ->
+                    Log.d("position", "recruiterNavGraph: ${Screen.DetailPosition.createRoute(navToken, navPosition)}")
+                    navController.navigate(Screen.DetailPosition.createRoute(navToken, navPosition))
                 },
                 navigateToAdd = { navToken ->
                     navController.navigate(Screen.AddPosition.createRoute(navToken))
@@ -85,11 +88,17 @@ fun NavGraphBuilder.recruiterNavGraph(
         }
         composable(
             route = Screen.DetailPosition.route,
-            arguments = listOf(navArgument(navKeyToken) { type = NavType.StringType }),
+            arguments = listOf(
+                navArgument(navKeyToken) { type = NavType.StringType },
+                navArgument(navKeyPosition) { type = NavType.StringType },
+            ),
         ) {
             val token = it.arguments?.getString(navKeyToken) ?: ""
+            val positionId = it.arguments?.getString(navKeyPosition) ?: ""
+            Log.d("position", "recruiterNavGraph: $positionId")
             DetailPositionScreen(
                 token = token,
+                positionId = positionId
             )
         }
         composable(

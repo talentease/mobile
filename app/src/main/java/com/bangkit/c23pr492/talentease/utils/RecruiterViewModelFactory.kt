@@ -8,6 +8,7 @@ import com.bangkit.c23pr492.talentease.di.Injection
 import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationViewModel
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionViewModel
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.position.detail.DetailPositionViewModel
 
 class RecruiterViewModelFactory private constructor(private val repository: RecruiterRepository) :
     ViewModelProvider.NewInstanceFactory() {
@@ -23,7 +24,9 @@ class RecruiterViewModelFactory private constructor(private val repository: Recr
             modelClass.isAssignableFrom(AddPositionViewModel::class.java) -> return AddPositionViewModel(
                 repository
             ) as T
-//            modelClass.isAssignableFrom(DetailViewModel::class.java) -> return DetailViewModel(repository) as T
+            modelClass.isAssignableFrom(DetailPositionViewModel::class.java) -> return DetailPositionViewModel(
+                repository
+            ) as T
 //            modelClass.isAssignableFrom(UploadViewModel::class.java) -> return UploadViewModel(repository) as T
 //            modelClass.isAssignableFrom(SettingViewModel::class.java) -> return SettingViewModel(repository) as T
 //            modelClass.isAssignableFrom(MapsViewModel::class.java) -> return MapsViewModel(repository) as T
@@ -34,8 +37,9 @@ class RecruiterViewModelFactory private constructor(private val repository: Recr
     companion object {
         @Volatile
         private var instance: RecruiterViewModelFactory? = null
-        fun getInstance(context: Context): RecruiterViewModelFactory = instance ?: synchronized(this) {
-            instance ?: RecruiterViewModelFactory(Injection.provideRecruiterRepository(context))
-        }.also { instance = it }
+        fun getInstance(context: Context): RecruiterViewModelFactory =
+            instance ?: synchronized(this) {
+                instance ?: RecruiterViewModelFactory(Injection.provideRecruiterRepository(context))
+            }.also { instance = it }
     }
 }

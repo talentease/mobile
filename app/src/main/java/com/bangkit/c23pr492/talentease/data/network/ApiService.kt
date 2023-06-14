@@ -1,6 +1,6 @@
 package com.bangkit.c23pr492.talentease.data.network
 
-import com.bangkit.c23pr492.talentease.data.model.application.ApplicationModel
+import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationUpdateResponse
 import com.bangkit.c23pr492.talentease.data.model.application.ApplyApplicationResponse
 import com.bangkit.c23pr492.talentease.data.model.position.*
@@ -17,11 +17,11 @@ interface ApiService {
         @Header("Authorization") token: String
     ): PositionListModel
 
-    @GET("position")
+    @GET("position/{positionId}")
     suspend fun getPositionByPositionId(
         @Header("Authorization") token: String,
         @Path("positionId") id: String
-    ): PositionItemModel
+    ): PositionByIdModel
 
     @GET("profile")
     suspend fun getProfileById(
@@ -30,11 +30,11 @@ interface ApiService {
     ): ProfileModel
 
     // Recruiter
-    @GET("application")
+    @GET("application/position")
     suspend fun getApplicationByPositionId(
         @Header("Authorization") token: String,
         @Path("positionId") id: String
-    ): ApplicationModel
+    ): ApplicationByPositionIdModel
 
     @PATCH("application")
     suspend fun updateApplication(
@@ -45,6 +45,13 @@ interface ApiService {
     @POST("position")
     suspend fun uploadPosition(
         @Header("Authorization") token: String,
+        @Body position: PositionModel
+    ): PositionResponse
+
+    @PATCH("position/{positionId}")
+    suspend fun updatePosition(
+        @Header("Authorization") token: String,
+        @Path("positionId") id: String,
         @Body position: PositionModel
     ): PositionResponse
 

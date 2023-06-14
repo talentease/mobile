@@ -20,8 +20,8 @@ sealed class Screen(val route: String) {
     object DetailRecruiterApplication : Screen("recruiter/application/detail/{$navKeyToken}") {
         fun createRoute(token: String) = "recruiter/application/detail/$token"
     }
-    object DetailPosition : Screen("recruiter/position/detail/{$navKeyToken}") {
-        fun createRoute(token: String) = "recruiter/position/detail/$token"
+    object DetailPosition : Screen("recruiter/position/detail/{$navKeyToken}&{$navKeyPosition}") {
+        fun createRoute(token: String, positionId: String) = "recruiter/position/detail/$token&$positionId"
     }
     object AddPosition : Screen("recruiter/position/add/{$navKeyToken}") {
         fun createRoute(token: String) = "recruiter/position/add/$token"

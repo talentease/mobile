@@ -179,22 +179,21 @@ fun AddPositionScreen(
 
             val dateDialogState = rememberMaterialDialogState()
             val timeDialogState = rememberMaterialDialogState()
-
-            Column(
-                modifier = Modifier,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Button(onClick = {
-                    dateDialogState.show()
-                }) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { dateDialogState.show() }
+                ) {
                     Text(text = "Pick date")
                 }
                 Text(text = formattedDate)
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = {
-                    timeDialogState.show()
-                }) {
+            }
+            Spacer(modifier = Modifier.padding(16.dp))
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { timeDialogState.show() }
+                ) {
                     Text(text = "Pick time")
                 }
                 Text(text = formattedTime)

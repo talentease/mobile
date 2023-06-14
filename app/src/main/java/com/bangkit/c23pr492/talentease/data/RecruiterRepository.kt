@@ -16,6 +16,18 @@ class RecruiterRepository(
     private val apiService: ApiService,
     private val mTalentEaseDao: TalentEaseDao
 ) {
+    fun getApplicationByPositionId(token: String, positionId: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getApplicationByPositionId(generateBearerToken(token), positionId)
+            Log.d(Const.tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }
+
     fun getAllPositions(token: String): Flow<Resource<List<PositionItemModel>?>> = flow {
         emit(Resource.Loading)
         try {
@@ -47,6 +59,18 @@ class RecruiterRepository(
             }
         }.flowOn(Dispatchers.IO)
 
+    fun getPositionByPositionID(token: String, positionId: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getPositionByPositionId(generateBearerToken(token), positionId)
+            Log.d(Const.tagRepository, response.toString())
+            emit(Resource.Success(response.data))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
+
     fun uploadPosition(token: String, position: PositionModel) = flow {
         emit(Resource.Loading)
         try {
@@ -55,6 +79,18 @@ class RecruiterRepository(
             emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(Const.tagRepository, "upload: ${Log.getStackTraceString(e)}")
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun updatePosition(token: String, positionId: String, position: PositionModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.updatePosition(generateBearerToken(token), positionId, position)
+            Log.d(Const.tagRepository, "update: $response")
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, "update: ${Log.getStackTraceString(e)}")
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
     }.flowOn(Dispatchers.IO)

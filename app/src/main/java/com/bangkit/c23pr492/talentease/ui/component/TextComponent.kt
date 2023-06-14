@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.ui.component
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,7 +11,7 @@ import com.bangkit.c23pr492.talentease.ui.values.textLarge
 import com.bangkit.c23pr492.talentease.ui.values.textRegular
 
 @Composable
-fun SubTitleText(modifier: Modifier = Modifier, string: String) {
+fun TitleText(modifier: Modifier = Modifier, string: String) {
     Text(
         text = string,
         fontWeight = FontWeight.SemiBold,
@@ -46,4 +47,28 @@ fun RegularText(modifier: Modifier = Modifier, string: String) {
         modifier = modifier
             .fillMaxWidth()
     )
+}
+
+@Composable
+fun StatusAndPositionText(modifier: Modifier = Modifier, status: String, position: String) {
+    Row(modifier = modifier) {
+        Text(
+            text = status,
+            fontWeight = FontWeight.Medium,
+            fontSize = textRegular,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier
+                .fillMaxWidth()
+        )
+        Text(
+            text = "/ $position",
+            fontWeight = FontWeight.Normal,
+            fontSize = textRegular,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier
+                .fillMaxWidth()
+        )
+    }
 }

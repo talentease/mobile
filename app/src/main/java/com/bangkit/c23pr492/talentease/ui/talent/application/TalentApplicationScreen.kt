@@ -182,7 +182,7 @@ fun TalentApplicationItems(
 //        }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
-            SubTitleText(
+            TitleText(
                 string = application.position.positionName,
                 modifier = Modifier.padding(bottom = 12.dp)
             )

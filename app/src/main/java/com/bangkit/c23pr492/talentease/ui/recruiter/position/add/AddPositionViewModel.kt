@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class AddPositionViewModel(private val recruiterRepository: RecruiterRepository) : ViewModel() {
+class AddPositionViewModel(private val repository: RecruiterRepository) : ViewModel() {
     private val _addPositionState = MutableStateFlow<UiState<PositionResponse>>(UiState.Initial)
     val addPositionState = _addPositionState.asStateFlow()
 
@@ -89,7 +89,7 @@ class AddPositionViewModel(private val recruiterRepository: RecruiterRepository)
 
     fun addPosition(token: String, position: PositionModel) =
         viewModelScope.launch(Dispatchers.IO) {
-            recruiterRepository.uploadPosition(token, position).collect {
+            repository.uploadPosition(token, position).collect {
                 when (it) {
                     Resource.Loading -> _addPositionState.emit(UiState.Loading)
                     is Resource.Error -> _addPositionState.emit(UiState.Error(it.error))

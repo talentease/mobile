@@ -1,11 +1,11 @@
 package com.bangkit.c23pr492.talentease.ui.recruiter.application
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -16,26 +16,26 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
-import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
+import com.bangkit.c23pr492.talentease.R
+import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
-import com.bangkit.c23pr492.talentease.ui.values.spacingRegular
-import com.bangkit.c23pr492.talentease.ui.values.textLarge
-import com.bangkit.c23pr492.talentease.ui.values.textRegular
+import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
+import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
+import com.bangkit.c23pr492.talentease.ui.component.StatusAndPositionText
+import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.Const.tagTestList
 import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,73 +51,51 @@ fun ApplicationScreen(
     ),
     navigateToDetail: (String) -> Unit
 ) {
-//    val listDataState = applicationViewModel.listApplicationState.collectAsState()
-//    val listPositionState = applicationViewModel.listPositionState.collectAsState()
-//    var isLoading by rememberSaveable { mutableStateOf(false) }
-//    LoadingProgressBar(isLoading = isLoading)
-//    Column(
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        modifier = modifier.fillMaxSize()
-//    ) {
-////        SearchBarScreen(applicationViewModel)
-//        val listState = rememberLazyListState()
-//        listPositionState.value.let { state ->
-//            when (state) {
-//                UiState.Empty -> {
-//                    isLoading = false
-//                    EmptyContentScreen(R.string.empty_list, modifier)
-//                }
-//                is UiState.Error -> {
-//                    isLoading = false
-//                    Toast.makeText(
-//                        LocalContext.current,
-//                        state.error.asString(LocalContext.current),
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//                UiState.Initial -> {
-//                    isLoading = false
-//                    applicationViewModel.getAllPositions(token)
-//                }
-//                UiState.Loading -> isLoading = true
-//                is UiState.Success -> {
-//                    state.data.forEach {
-//                        applicationViewModel.getAllApplications(token, it.id)
-//                    }
-//                }
-//            }
-//        }
-//        listDataState.value.let { state ->
-//            when (state) {
-//                UiState.Initial -> {
-//                    isLoading = false
-//                    applicationViewModel.getAllApplications(token, )
-//                }
-//                is UiState.Loading -> isLoading = true
-//                is UiState.Empty -> {
-//                    isLoading = false
-//                    EmptyContentScreen(R.string.empty_list, modifier)
-//                }
-//                is UiState.Success -> {
-//                    isLoading = false
-//                    ApplicationContentScreen(
-//                        token,
-//                        listState,
-//                        state.data,
-//                        navigateToDetail = navigateToDetail
-//                    )
-//                }
-//                is UiState.Error -> {
-//                    isLoading = false
-//                    Toast.makeText(
-//                        LocalContext.current,
-//                        state.error.asString(LocalContext.current),
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-//            }
-//        }
-//    }
+    val listPositionState = applicationViewModel.listPositionState.collectAsState()
+    val applicationState = applicationViewModel.applicationState.collectAsState()
+    val listApplication = applicationViewModel.listApplication
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    LoadingProgressBar(isLoading = isLoading)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize()
+    ) {
+//        SearchBarScreen(applicationViewModel)
+        val listState = rememberLazyListState()
+        listPositionState.value.let { position ->
+            when (position) {
+                UiState.Empty -> {
+                    isLoading = false
+                    EmptyContentScreen(R.string.empty_list, modifier)
+                }
+                UiState.Initial -> {
+                    isLoading = false
+                    applicationViewModel.getAllPositions(token)
+                }
+                UiState.Loading -> isLoading = true
+                is UiState.Error -> {
+                    isLoading = false
+                    Toast.makeText(
+                        context,
+                        position.error.asString(context),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is UiState.Success -> {
+                    position.data.forEach {
+                        applicationViewModel.getApplicationByPositionId(token, it.id)
+                    }
+                    isLoading = false
+                    ApplicationContentScreen(
+                        token,
+                        listState,
+                        listApplication,
+                        navigateToDetail = navigateToDetail
+                    )
+                }
+            }
+        }
+    }
 //    Log.d("token", "ApplicationScreen: $token")
 }
 
@@ -167,7 +145,7 @@ fun SearchBarScreen(applicationViewModel: ApplicationViewModel) {
 fun ApplicationContentScreen(
     token: String,
     listState: LazyListState = rememberLazyListState(),
-    data: List<ApplicationModel>,
+    data: List<ApplicationByPositionIdModel>,
     modifier: Modifier = Modifier,
     navigateToDetail: (String) -> Unit
 ) {
@@ -212,59 +190,19 @@ fun ApplicationContentScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ApplicationItems(
     token: String,
-    application: ApplicationModel,
+    application: ApplicationByPositionIdModel,
     modifier: Modifier = Modifier,
     navigateToDetail: (String) -> Unit,
 ) {
     application.apply {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-                .combinedClickable(
-                    onClick = {
-
-                    },
-                    onLongClick = {
-
-                    }
-                )
-                .clickable {
-                    navigateToDetail(token)
-                }
-                .padding(spacingRegular)
-        ) {
-            AsyncImage(
-                model = photo,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .padding(end = spacingRegular)
-                    .size(54.dp)
-            )
-            Column(
-                verticalArrangement = Arrangement.SpaceAround,
-            ) {
-                Text(
-                    text = name,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = textLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-                Text(
-                    text = "$status / $position",
-                    fontWeight = FontWeight.Normal,
-                    fontSize = textRegular,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
+        Column(modifier = modifier.clickable {
+            navigateToDetail(token)
+        }) {
+//            TitleText(string = candidate.firstName + candidate.lastName)
+            StatusAndPositionText(status = status, position = position.title)
         }
     }
 }

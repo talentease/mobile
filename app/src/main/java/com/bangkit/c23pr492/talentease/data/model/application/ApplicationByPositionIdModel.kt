@@ -2,7 +2,7 @@ package com.bangkit.c23pr492.talentease.data.model.application
 
 import com.google.gson.annotations.SerializedName
 
-data class ApplicationByPositionModel(
+data class ApplicationByPositionIdModel(
 
 	@field:SerializedName("createdAt")
 	val createdAt: String,
@@ -32,22 +32,31 @@ data class ApplicationByPositionModel(
 	val updatedAt: String
 )
 
-data class Company(
+data class Candidate(
+
+	@field:SerializedName("uid")
+	val uid: String,
+
+	@field:SerializedName("firstName")
+	val firstName: String,
+
+	@field:SerializedName("lastName")
+	val lastName: String,
 
 	@field:SerializedName("createdAt")
 	val createdAt: String,
 
-	@field:SerializedName("address")
-	val address: String,
+	@field:SerializedName("phoneNumber")
+	val phoneNumber: String,
 
-	@field:SerializedName("name")
-	val name: String,
+	@field:SerializedName("role")
+	val role: String,
 
-	@field:SerializedName("description")
-	val description: String,
+	@field:SerializedName("updateAt")
+	val updateAt: String,
 
-	@field:SerializedName("updatedAt")
-	val updatedAt: String
+	@field:SerializedName("email")
+	val email: String
 )
 
 data class Position(
@@ -80,29 +89,20 @@ data class Position(
 	val updatedAt: String
 )
 
-data class Candidate(
-
-	@field:SerializedName("uid")
-	val uid: String,
-
-	@field:SerializedName("firstName")
-	val firstName: String,
-
-	@field:SerializedName("lastName")
-	val lastName: String,
+data class Company(
 
 	@field:SerializedName("createdAt")
 	val createdAt: String,
 
-	@field:SerializedName("phoneNumber")
-	val phoneNumber: String,
+	@field:SerializedName("address")
+	val address: String,
 
-	@field:SerializedName("role")
-	val role: String,
+	@field:SerializedName("name")
+	val name: String,
 
-	@field:SerializedName("updateAt")
-	val updateAt: String,
+	@field:SerializedName("description")
+	val description: String,
 
-	@field:SerializedName("email")
-	val email: String
+	@field:SerializedName("updatedAt")
+	val updatedAt: String
 )

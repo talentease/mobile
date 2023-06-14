@@ -83,7 +83,7 @@ class TalentRepository(
                 positionId
             )
             Log.d(tagRepository, response.toString())
-            emit(Resource.Success(response))
+            emit(Resource.Success(response.data))
         } catch (e: Exception) {
             Log.e(tagRepository, Log.getStackTraceString(e))
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
