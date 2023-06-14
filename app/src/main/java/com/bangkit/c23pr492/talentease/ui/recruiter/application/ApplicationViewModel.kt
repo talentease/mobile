@@ -4,53 +4,94 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.data.Resource
-import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
+import com.bangkit.c23pr492.talentease.data.model.application.ApplicationItem
+import com.bangkit.c23pr492.talentease.data.model.application.ApplicationWithProfile
+import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ApplicationViewModel(private val repository: RecruiterRepository) : ViewModel() {
+    private val _listPositionState =
+        MutableStateFlow<UiState<List<PositionItemModel>>>(UiState.Initial)
+    val listPositionState = _listPositionState.asStateFlow()
+
     private val _listApplicationState =
-        MutableStateFlow<UiState<List<ApplicationModel>>>(UiState.Initial)
+        MutableStateFlow<UiState<List<ApplicationItem>>>(UiState.Initial)
     val listApplicationState = _listApplicationState.asStateFlow()
+
+//    private val _profileState =
+//        MutableStateFlow<UiState<ProfileModel>>(UiState.Initial)
+//    val profileState = _profileState.asStateFlow()
+
+    private val _listApplicationWithProfile = MutableStateFlow<UiState<List<ApplicationWithProfile>>>(UiState.Initial)
+
+//    private val _listAllApplicant = mutableListOf<ProfileModel>()
+//    val listAllApplicationState = _listAllApplicant
+//
+//    private val _searchApplicant = mutableListOf<ProfileModel>()
+//    val searchApplicationState = _searchApplicant
 
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
 
-    fun getAllApplications() {
+    fun getAllPositions(token: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllApplications().collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+            repository.getAllPositions(token).collect {
+                when (it) {
+                    Resource.Loading -> _listPositionState.emit(UiState.Loading)
                     is Resource.Success -> {
-                        _listApplicationState.emit(UiState.Success(resource.data))
+                        if (it.data.isNullOrEmpty()) _listPositionState.emit(UiState.Empty)
+                        else _listPositionState.emit(UiState.Success(it.data))
+
                     }
-                    is Resource.Error -> {
-                        _listApplicationState.emit(UiState.Error(resource.error))
-                    }
+                    is Resource.Error -> _listPositionState.emit(UiState.Error(it.error))
                 }
             }
         }
     }
 
-    fun searchApplications(newQuery: String) {
-        _query.value = newQuery
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.searchApplications(newQuery).collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> _listApplicationState.emit(UiState.Loading)
-                    is Resource.Success -> {
-                        _listApplicationState.emit(
-                            if (resource.data.isNotEmpty()) UiState.Success(resource.data) else UiState.Empty
-                        )
-                    }
-                    is Resource.Error -> {
-                        _listApplicationState.emit(UiState.Error(resource.error))
-                    }
-                }
-            }
-        }
-    }
+//    fun getAllApplications(token: String, positionId: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.getAllApplicationsByPositionId(token, positionId).collect { resource ->
+//                when (resource) {
+//                    is Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+//                    is Resource.Success -> {
+//                        resource.data.data.forEach {
+//                            getProfileById(token, it.id)
+//                        }
+//                        _listApplicationState.emit(UiState.Success(resource.data.data))
+//                    }
+//                    is Resource.Error -> {
+//                        _listApplicationState.emit(UiState.Error(resource.error))
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    fun getProfileById(token: String, uid: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            repository.getProfileById(token, uid).collect {
+//                when (it) {
+//                    Resource.Loading -> _profileState.emit(UiState.Loading)
+//                    is Resource.Success -> {
+//                        _listAllApplicant.add(it.data)
+//                        _profileState.emit(UiState.Success(it.data))
+//                    }
+//                    is Resource.Error -> _profileState.emit(UiState.Error(it.error))
+//                }
+//            }
+//        }
+//    }
+//
+//    fun searchApplications(newQuery: String) {
+//        _query.value = newQuery
+//        viewModelScope.launch(Dispatchers.IO) {
+//            _listAllApplicant.filter {
+//                it.data.firstName.contains(newQuery, ignoreCase = true)
+//            }
+//        }
+//    }
 }

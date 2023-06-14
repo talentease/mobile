@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.database.PositionWithCompany
+import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.*
 import com.bangkit.c23pr492.talentease.ui.core.UiState
@@ -59,6 +59,7 @@ fun VacancyScreen(
         modifier = modifier.fillMaxSize()
     ) {
         SearchBarScreen(
+            token,
             vacancyViewModel
         )
         val listState = rememberLazyListState()
@@ -66,7 +67,7 @@ fun VacancyScreen(
             when (state) {
                 UiState.Initial -> {
                     isLoading = false
-                    vacancyViewModel.getAllPosition()
+                    vacancyViewModel.getAllPosition(token)
                 }
                 is UiState.Loading -> isLoading = true
                 is UiState.Empty -> {
@@ -97,12 +98,14 @@ fun VacancyScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBarScreen(vacancyViewModel: VacancyViewModel) {
+fun SearchBarScreen(token: String, vacancyViewModel: VacancyViewModel) {
     val query by vacancyViewModel.query.collectAsState()
     var active by rememberSaveable { mutableStateOf(false) }
     SearchBar(
         query = query,
-        onQueryChange = vacancyViewModel::searchPositions,
+        onQueryChange = {
+            vacancyViewModel.searchPositions(token, it)
+        },
         onSearch = {
             active = false
         },
@@ -123,7 +126,7 @@ fun SearchBarScreen(vacancyViewModel: VacancyViewModel) {
                     contentDescription = "Search Icon",
                     modifier = Modifier.clickable {
                         if (query.isNotEmpty()) {
-                            vacancyViewModel.searchPositions("")
+                            vacancyViewModel.searchPositions(token, "")
                         } else {
                             active = false
                         }
@@ -141,7 +144,7 @@ fun SearchBarScreen(vacancyViewModel: VacancyViewModel) {
 fun VacancyContentScreen(
     token: String,
     listState: LazyListState = rememberLazyListState(),
-    data: List<PositionWithCompany>,
+    data: List<PositionItemModel>,
     modifier: Modifier = Modifier,
     navigateToDetail: (String, String) -> Unit
 ) {
@@ -155,7 +158,7 @@ fun VacancyContentScreen(
             contentPadding = PaddingValues(bottom = 80.dp),
             modifier = modifier.testTag(Const.tagTestList)
         ) {
-            items(data, key = { it.position.positionId }) { position ->
+            items(data, key = { it.id }) { position ->
                 VacancyItems(
                     token,
                     position,
@@ -213,27 +216,27 @@ fun ScrollToTopButton(
 @Composable
 fun VacancyItems(
     token: String,
-    vacancy: PositionWithCompany,
+    vacancy: PositionItemModel,
     modifier: Modifier = Modifier,
     navigateToDetail: (String, String) -> Unit
 ) {
     Card(
         modifier = modifier,
         onClick = {
-            navigateToDetail(token, vacancy.position.positionId)
+            navigateToDetail(token, vacancy.id)
         }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
             SubTitleText(
-                string = vacancy.position.positionName,
+                string = vacancy.title ?: "",
                 modifier = Modifier.padding(bottom = 12.dp)
             )
             DescriptionText(
-                string = vacancy.company.companyName,
+                string = vacancy.company?.name ?: "",
                 modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
             )
             RegularText(
-                string = vacancy.position.positionDescription,
+                string = vacancy.type ?: "",
                 modifier = Modifier.padding(start = 8.dp)
             )
         }

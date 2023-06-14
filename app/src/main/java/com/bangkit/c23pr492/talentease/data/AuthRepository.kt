@@ -57,6 +57,8 @@ class AuthRepository(
         emit(Resource.Loading)
         try {
             val response = firebaseAuth.signInWithEmailAndPassword(email, password).await()
+            val uid = response.user?.uid
+            Log.d("uid", "loginUser: UID: $uid")
             emit(Resource.Success(response.user))
         } catch (e: Exception) {
             Log.e(tagRepository, Log.getStackTraceString(e))

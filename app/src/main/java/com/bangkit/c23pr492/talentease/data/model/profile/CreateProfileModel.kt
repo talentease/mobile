@@ -1,8 +1,8 @@
-package com.bangkit.c23pr492.talentease.data.model
+package com.bangkit.c23pr492.talentease.data.model.profile
 
 import com.google.gson.annotations.SerializedName
 
-data class ProfileModel(
+data class CreateProfileModel(
 
 	@field:SerializedName("firstName")
 	val firstName: String,

@@ -25,7 +25,7 @@ class LoginViewModel : AuthTextFieldViewModel() {
             }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
+                started = SharingStarted.WhileSubscribed(2_000),
                 initialValue = false
             )
 
@@ -43,7 +43,7 @@ class LoginViewModel : AuthTextFieldViewModel() {
             }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
+                started = SharingStarted.WhileSubscribed(2_000),
                 initialValue = false
             )
 

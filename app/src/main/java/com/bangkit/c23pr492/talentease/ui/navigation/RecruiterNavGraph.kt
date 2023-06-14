@@ -99,8 +99,8 @@ fun NavGraphBuilder.recruiterNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             AddPositionScreen(
                 token = token,
-                navigateToPosition = { navToken ->
-                    navController.navigate(Screen.Position.createRoute(navToken)) {
+                navigateToPosition = { route ->
+                    navController.navigate(route) {
                         popUpTo(recruiterGraphRoute) {
                             inclusive = true
                         }

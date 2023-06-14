@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
@@ -35,7 +35,6 @@ import com.bangkit.c23pr492.talentease.ui.component.PositionItems
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.Const
-import com.bangkit.c23pr492.talentease.utils.Const.tagRepository
 import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
 import kotlinx.coroutines.launch
@@ -179,7 +178,6 @@ fun PositionContentScreen(
                         .animateItemPlacement(tween(durationMillis = 100)),
 //                    navigateToDetail = navigateToDetail
                 )
-                Log.d(tagRepository, "PositionContentScreen: berhitung 123")
             }
             item { }
         }

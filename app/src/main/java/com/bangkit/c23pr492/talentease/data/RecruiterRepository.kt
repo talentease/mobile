@@ -1,13 +1,9 @@
 package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
-import com.bangkit.c23pr492.talentease.data.database.CompanyEntity
-import com.bangkit.c23pr492.talentease.data.database.PositionEntity
 import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
-import com.bangkit.c23pr492.talentease.data.model.ApplicationModel
-import com.bangkit.c23pr492.talentease.data.model.ApplicationsData
-import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
-import com.bangkit.c23pr492.talentease.data.model.PositionListModel
+import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.position.PositionModel
 import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const
 import com.bangkit.c23pr492.talentease.utils.UiText
@@ -20,11 +16,10 @@ class RecruiterRepository(
     private val apiService: ApiService,
     private val mTalentEaseDao: TalentEaseDao
 ) {
-    fun getAllApplications(): Flow<Resource<List<ApplicationModel>>> = flow {
+    fun getAllPositions(token: String): Flow<Resource<List<PositionItemModel>?>> = flow {
         emit(Resource.Loading)
         try {
-            val response = ApplicationsData.listApplicationData
-            addCompany(CompanyEntity.company1)
+            val response = apiService.getAllPositions(generateBearerToken(token)).data?.toList()
             Log.d(Const.tagRepository, response.toString())
             emit(Resource.Success(response))
         } catch (e: Exception) {
@@ -33,33 +28,10 @@ class RecruiterRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun searchApplications(query: String): Flow<Resource<List<ApplicationModel>>> = flow {
-        emit(Resource.Loading)
-        try {
-            val response = ApplicationsData.listApplicationData.filter {
-                it.name.contains(query, ignoreCase = true)
-            }
-            Log.d(Const.tagRepository, response.toString())
-            emit(Resource.Success(response))
-        } catch (e: Exception) {
-            Log.e(Const.tagRepository, Log.getStackTraceString(e))
-            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
-        }
-    }.flowOn(Dispatchers.IO)
-
-    fun getAllPositions(token: String): Flow<Resource<PositionListModel>> = flow {
-        emit(Resource.Loading)
-        try {
-            val response = apiService.getAllPositions(generateBearerToken(token))
-            Log.d(Const.tagRepository, response.toString())
-            emit(Resource.Success(response))
-        } catch (e: Exception) {
-            Log.e(Const.tagRepository, Log.getStackTraceString(e))
-            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
-        }
-    }.flowOn(Dispatchers.IO)
-
-    fun searchPositions(token: String, query: String): Flow<Resource<List<PositionItemModel>?>> =
+    fun searchPositionsFromName(
+        token: String,
+        query: String
+    ): Flow<Resource<List<PositionItemModel>?>> =
         flow {
             emit(Resource.Loading)
             try {
@@ -75,21 +47,17 @@ class RecruiterRepository(
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun addPosition(position: PositionEntity) {
-        mTalentEaseDao.upsertPosition(position)
-    }
-
-    suspend fun removePosition(position: PositionEntity) {
-        mTalentEaseDao.deletePosition(position)
-    }
-
-    suspend fun addCompany(company: CompanyEntity) {
-        mTalentEaseDao.upsertCompany(company)
-    }
-
-    suspend fun removeCompany(company: CompanyEntity) {
-        mTalentEaseDao.upsertCompany(company)
-    }
+    fun uploadPosition(token: String, position: PositionModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.uploadPosition(generateBearerToken(token), position)
+            Log.d(Const.tagRepository, "upload: $response")
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, "upload: ${Log.getStackTraceString(e)}")
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
 
     private fun generateBearerToken(token: String): String {
         return if (token.contains("bearer", true)) {

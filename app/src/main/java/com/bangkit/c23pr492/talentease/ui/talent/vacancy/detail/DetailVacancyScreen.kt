@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.database.PositionWithCompany
+import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
@@ -45,7 +45,7 @@ fun DetailVacancyScreen(
         when (state) {
             UiState.Initial -> {
                 isLoading = false
-                detailVacancyViewModel.getPositionWithCompanyId(positionId)
+                detailVacancyViewModel.getPositionByPositionId(token, positionId)
             }
             is UiState.Loading -> isLoading = true
             is UiState.Empty -> {
@@ -76,7 +76,7 @@ fun DetailVacancyScreen(
 @Composable
 fun DetailVacancyContentScreen(
     token: String,
-    position: PositionWithCompany,
+    position: PositionItemModel,
     detailVacancyViewModel: DetailVacancyViewModel,
     navigateToApplication: (String) -> Unit
 ) {
@@ -89,9 +89,9 @@ fun DetailVacancyContentScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = position.position.positionName)
-                Text(text = position.company.companyName)
-                Text(text = position.company.companyAddress)
+                Text(text = position.title ?: "")
+                Text(text = position.company?.name ?: "")
+                Text(text = position.company?.address ?: "")
             }
         }
         Card {
@@ -99,13 +99,13 @@ fun DetailVacancyContentScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(8.dp)
             ) {
-                Text(text = position.position.positionType)
-                Text(text = position.position.positionDescription)
+                Text(text = position.type ?: "")
+                Text(text = position.description ?: "")
             }
         }
         Button(
             onClick = {
-                detailVacancyViewModel.applyApplication()
+                detailVacancyViewModel.applyApplication(token, position.id, null)
                 navigateToApplication(token)
             }
         ) {

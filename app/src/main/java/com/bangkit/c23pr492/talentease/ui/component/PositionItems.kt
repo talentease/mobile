@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bangkit.c23pr492.talentease.data.model.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
 
 @Composable
