@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.ui.recruiter.application
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.RecruiterRepository
@@ -34,6 +35,7 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
                     is Resource.Success -> {
                         if (it.data.isNullOrEmpty()) _listPositionState.emit(UiState.Empty)
                         else _listPositionState.emit(UiState.Success(it.data))
+                        Log.d("applicant", "getAllPositions: ${it.data}")
                     }
                     is Resource.Error -> _listPositionState.emit(UiState.Error(it.error))
                 }
@@ -48,8 +50,11 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
                     Resource.Loading -> _applicationState.emit(UiState.Loading)
                     is Resource.Error -> _applicationState.emit(UiState.Error(it.error))
                     is Resource.Success -> {
-                        _listApplication.add(it.data)
-                        _applicationState.emit(UiState.Success(it.data))
+                        if (it.data.id != null) {
+                            _listApplication.add(it.data)
+                            Log.d("applicant", "getApplicationByPositionId: ${it.data}")
+                            _applicationState.emit(UiState.Success(it.data))
+                        } else _applicationState.emit(UiState.Empty)
                     }
                 }
             }

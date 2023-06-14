@@ -1,6 +1,7 @@
 package com.bangkit.c23pr492.talentease.ui.recruiter.application
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -31,6 +32,7 @@ import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.component.StatusAndPositionText
+import com.bangkit.c23pr492.talentease.ui.component.TitleText
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.Const.tagTestList
@@ -83,6 +85,7 @@ fun ApplicationScreen(
                 }
                 is UiState.Success -> {
                     position.data.forEach {
+                        Log.d("applicant", "ApplicationScreen: ${it.id}")
                         applicationViewModel.getApplicationByPositionId(token, it.id)
                     }
                     isLoading = false
@@ -159,7 +162,7 @@ fun ApplicationContentScreen(
             contentPadding = PaddingValues(bottom = 80.dp),
             modifier = modifier.testTag(tagTestList)
         ) {
-            items(data, key = { it.id }) { application ->
+            items(data, key = { it.id.toString() }) { application ->
                 ApplicationItems(
                     token,
                     application,
@@ -201,8 +204,8 @@ fun ApplicationItems(
         Column(modifier = modifier.clickable {
             navigateToDetail(token)
         }) {
-//            TitleText(string = candidate.firstName + candidate.lastName)
-            StatusAndPositionText(status = status, position = position.title)
+            TitleText(string = candidate?.firstName + candidate?.lastName)
+            StatusAndPositionText(status = status.toString(), position = position?.title.toString())
         }
     }
 }

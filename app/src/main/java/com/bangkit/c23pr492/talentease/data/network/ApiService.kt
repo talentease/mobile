@@ -30,7 +30,7 @@ interface ApiService {
     ): ProfileModel
 
     // Recruiter
-    @GET("application/position")
+    @GET("application/position/{positionId}")
     suspend fun getApplicationByPositionId(
         @Header("Authorization") token: String,
         @Path("positionId") id: String
