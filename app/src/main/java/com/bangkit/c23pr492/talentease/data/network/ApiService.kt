@@ -23,7 +23,7 @@ interface ApiService {
         @Path("positionId") id: String
     ): PositionByIdModel
 
-    @GET("profile")
+    @GET("profile/{uid}")
     suspend fun getProfileById(
         @Header("Authorization") token: String,
         @Path("uid") id: String
@@ -61,6 +61,6 @@ interface ApiService {
     suspend fun applyPositions(
         @Header("Authorization") token: String,
         @Part("positionId") positionId: RequestBody,
-        @Part file: MultipartBody.Part?,
+        @Part file: MultipartBody.Part,
     ): ApplyApplicationResponse
 }

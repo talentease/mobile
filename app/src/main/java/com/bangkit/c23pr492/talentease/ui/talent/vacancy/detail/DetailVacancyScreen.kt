@@ -1,7 +1,13 @@
 package com.bangkit.c23pr492.talentease.ui.talent.vacancy.detail
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -19,10 +25,16 @@ import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.AuthViewModelFactory
+import com.bangkit.c23pr492.talentease.utils.File.uriToFile
 import com.bangkit.c23pr492.talentease.utils.TalentViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
+import kotlinx.coroutines.flow.collectLatest
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 
 @Composable
 fun DetailVacancyScreen(
@@ -40,7 +52,7 @@ fun DetailVacancyScreen(
 ) {
     val dataState = detailVacancyViewModel.positionState.collectAsState()
     var isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading, modifier = modifier)
+    LoadingProgressBar(isLoading = isLoading)
     dataState.value.let { state ->
         when (state) {
             UiState.Initial -> {
@@ -80,6 +92,32 @@ fun DetailVacancyContentScreen(
     detailVacancyViewModel: DetailVacancyViewModel,
     navigateToApplication: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    var imageMultipart: MultipartBody.Part? = null
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedFile: Uri = result.data?.data as Uri
+            val myFile = uriToFile(selectedFile, context)
+            val requestImageFile = myFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            Log.d("upload", "DetailVacancyContentScreen: req $requestImageFile")
+            imageMultipart = MultipartBody.Part.createFormData(
+                "photo",
+                myFile.name,
+                requestImageFile
+            )
+            Log.d("upload", "DetailVacancyContentScreen: imp $imageMultipart")
+        }
+    }
+    LaunchedEffect(key1 = true) {
+        detailVacancyViewModel.eventFlow.collectLatest {
+            when (it) {
+                is UiEvents.NavigateEvent -> navigateToApplication(it.route)
+                else -> {}
+            }
+        }
+    }
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.padding(16.dp)
@@ -105,8 +143,18 @@ fun DetailVacancyContentScreen(
         }
         Button(
             onClick = {
-                detailVacancyViewModel.applyApplication(token, position.id, null)
-                navigateToApplication(token)
+                val intent = Intent()
+                intent.action = Intent.ACTION_GET_CONTENT
+                intent.type = "image/jpeg"
+                val chooser = Intent.createChooser(intent, "Choose a Picture")
+                pickFileLauncher.launch(chooser)
+            }
+        ) {
+            Text(text = "Select CV")
+        }
+        Button(
+            onClick = {
+                imageMultipart?.let { detailVacancyViewModel.applyPosition(token, position.id, it) }
             }
         ) {
             Text(text = "Apply Now")

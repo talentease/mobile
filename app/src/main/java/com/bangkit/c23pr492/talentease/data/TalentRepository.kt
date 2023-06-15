@@ -34,14 +34,14 @@ class TalentRepository(
         mTalentEaseDao.upsertApplication(ApplicationEntity.application1)
     }
 
-    fun getTalentId(): Flow<String?> = authDataStore.getTalentId()
+    fun getTalentId(): Flow<String?> = authDataStore.getUserId()
 
     suspend fun saveTalentId(talentId: String) {
-        authDataStore.saveTalentId(talentId)
+        authDataStore.getUserId()
     }
 
     private suspend fun clearTalentId() {
-        authDataStore.clearTalentId()
+        authDataStore.getUserId()
     }
 
     fun getAllPosition(token: String) = flow {
@@ -90,21 +90,50 @@ class TalentRepository(
         }
     }
 
-    fun applyPosition(token: String, positionId: String, file: MultipartBody.Part?) = flow {
+    fun applyPosition(token: String, positionId: String, file: MultipartBody.Part) = flow {
         emit(Resource.Loading)
         try {
+            Log.d("upload", "applyPosition: posId $positionId")
             val response = apiService.applyPositions(
                 generateBearerToken(token),
                 positionId.toRequestBody("text/plain".toMediaType()),
                 file
             )
-            Log.d(tagRepository, response.toString())
+            Log.d(tagRepository, "upload $response")
             emit(Resource.Success(response))
         } catch (e: Exception) {
-            Log.e(tagRepository, Log.getStackTraceString(e))
+            Log.e(tagRepository, "upload " + Log.getStackTraceString(e))
+            Log.e(tagRepository, "upload " + e.message)
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
-    }
+    }.flowOn(Dispatchers.IO)
+
+//    suspend fun applyPosition(token: String, positionId: String, file: MultipartBody.Part) {
+//        val client = apiService.applyPositions(
+//            generateBearerToken(token),
+//            positionId.toRequestBody("text/plain".toMediaType()),
+//            file
+//        )
+//        with(client) {
+//            enqueue(object : Callback<ApplyApplicationResponse> {
+//                override fun onResponse(
+//                    call: Call<ApplyApplicationResponse>,
+//                    response: Response<ApplyApplicationResponse>
+//                ) {
+//                    if (response.isSuccessful) {
+//                        response.body()?.data
+//                        Log.e("upload", "onSuccess: ${response.body()?.data}")
+//                    } else {
+//                        Log.e("upload", "onFailure: ${response.message()}")
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<ApplyApplicationResponse>, t: Throwable) {
+//                    Log.e("upload", "onFailure: ${t.message.toString()}")
+//                }
+//            })
+//        }
+//    }
 
     //    fun getPositionWithPositionId(positionId: String) = flow {
 //        emit(Resource.Loading)

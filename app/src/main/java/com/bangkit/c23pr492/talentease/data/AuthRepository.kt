@@ -3,6 +3,7 @@ package com.bangkit.c23pr492.talentease.data
 import android.util.Log
 import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.data.datastore.AuthDataStore
+import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const.tagRepository
 import com.bangkit.c23pr492.talentease.utils.UiText
 import com.google.firebase.auth.FirebaseAuth
@@ -15,7 +16,8 @@ import kotlinx.coroutines.tasks.await
 
 class AuthRepository(
     private val firebaseAuth: FirebaseAuth,
-    private val authDataStore: AuthDataStore
+    private val authDataStore: AuthDataStore,
+    private val apiService: ApiService
 ) {
     fun getToken(): Flow<String?> = authDataStore.getToken()
 
@@ -27,38 +29,30 @@ class AuthRepository(
         authDataStore.clearToken()
     }
 
+//    fun getUserId(): Flow<String?> = authDataStore.getUserId()
+//
+//    suspend fun saveUserId(uid: String) {
+//        authDataStore.saveUserId(uid)
+//    }
+//
+//    private suspend fun clearUserId() {
+//        authDataStore.clearUserId()
+//    }
+
     fun getRole(): Flow<String?> = authDataStore.getRole()
 
-    suspend fun saveRole(role: String) {
-        authDataStore.saveRole(role)
+    suspend fun saveRole(token: String) {
+        authDataStore.saveRole(token)
     }
 
     private suspend fun clearRole() {
         authDataStore.clearRole()
     }
 
-    fun checkRole(token: String): Flow<Resource<String>> = flow {
-        emit(Resource.Loading)
-        try {
-            Log.d(tagRepository, "checkRole: $token")
-            val response = "recruiter"
-            emit(Resource.Success(response))
-        } catch (e: Exception) {
-            Log.e(tagRepository, Log.getStackTraceString(e))
-            if (e.message.isNullOrBlank()) {
-                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
-            } else {
-                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
-            }
-        }
-    }
-
     fun loginUser(email: String, password: String): Flow<Resource<FirebaseUser?>> = flow {
         emit(Resource.Loading)
         try {
             val response = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            val uid = response.user?.uid
-            Log.d("uid", "loginUser: UID: $uid")
             emit(Resource.Success(response.user))
         } catch (e: Exception) {
             Log.e(tagRepository, Log.getStackTraceString(e))
@@ -90,7 +84,23 @@ class AuthRepository(
         try {
             val response = firebaseAuth.signOut().also {
                 clearToken()
+                clearRole()
             }
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            if (e.message.isNullOrBlank()) {
+                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
+            } else {
+                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun getRoleById(token: String, uid: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getProfileById(token, uid)
             emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(tagRepository, Log.getStackTraceString(e))
@@ -107,9 +117,10 @@ class AuthRepository(
         private var instance: AuthRepository? = null
         fun getInstance(
             firebaseAuth: FirebaseAuth,
-            authDataStore: AuthDataStore
+            authDataStore: AuthDataStore,
+            apiService: ApiService
         ): AuthRepository = instance ?: synchronized(this) {
-            instance ?: AuthRepository(firebaseAuth, authDataStore)
+            instance ?: AuthRepository(firebaseAuth, authDataStore, apiService)
         }.also { instance = it }
     }
 }

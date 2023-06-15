@@ -33,13 +33,21 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun prepareEvent() = viewModelScope.launch(Dispatchers.IO) {
         _tokenState.combine(_roleState) { token, role ->
-            when(token) {
+            when (token) {
                 is UiState.Success -> {
-                    when(role) {
+                    when (role) {
                         is UiState.Success -> {
-                            when(role.data) {
-                                "recruiter" -> return@combine UiEvents.NavigateEvent(Screen.Application.createRoute(token.data))
-                                "talent" -> return@combine UiEvents.NavigateEvent(Screen.Vacancy.createRoute(token.data))
+                            when (role.data) {
+                                "recruiter" -> return@combine UiEvents.NavigateEvent(
+                                    Screen.Application.createRoute(
+                                        token.data
+                                    )
+                                )
+                                "candidate" -> return@combine UiEvents.NavigateEvent(
+                                    Screen.Vacancy.createRoute(
+                                        token.data
+                                    )
+                                )
                                 else -> return@combine UiEvents.SnackBarEvent(UiText.DynamicString("Unknown Role"))
                             }
                         }
@@ -85,9 +93,9 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                     if (it.data != null) {
                         val token = it.data.getIdToken(true).await().token.toString()
                         repository.saveToken(token)
-                        checkRole(token)
+                        Log.d("login", "loginUser: masuk login $token")
+                        checkRole(token, it.data.uid)
                         _tokenState.emit(UiState.Success(token))
-                        Log.d("login", "loginUser: email ${it.data.email}")
                     } else {
                         _tokenState.emit(UiState.Empty)
                     }
@@ -119,15 +127,22 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         }
     }
 
-    fun checkRole(token: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.checkRole(token).collect {
+    fun checkRole(token: String, uid: String) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("login", "checkRole: masuk")
+        repository.getRoleById(token, uid).collect {
             when (it) {
-                is Resource.Loading -> _roleState.emit(UiState.Loading)
-                is Resource.Success -> {
-                    repository.saveRole(it.data)
-                    _roleState.emit(UiState.Success(it.data))
-                }
                 is Resource.Error -> _roleState.emit(UiState.Error(it.error))
+                Resource.Loading -> _roleState.emit(UiState.Loading)
+                is Resource.Success -> {
+                    if (it.data.data.role.isEmpty()) {
+                        Log.d("login", "loginUser: role empty ${it.data.data.role}")
+                        _roleState.emit(UiState.Empty)
+                    } else {
+                        repository.saveRole(it.data.data.role)
+                        Log.d("login", "loginUser: role ${it.data.data.role}")
+                        _roleState.emit(UiState.Success(it.data.data.role))
+                    }
+                }
             }
         }
     }
@@ -135,6 +150,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun getToken() = viewModelScope.launch(Dispatchers.IO) {
         repository.getToken().collect {
             _tokenState.emit(UiState.Loading)
+            Log.d("login", "getToken: $it")
             if (it.isNullOrBlank()) _tokenState.emit(UiState.Empty)
             else _tokenState.emit(UiState.Success(it))
         }
@@ -143,29 +159,9 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun getRole() = viewModelScope.launch(Dispatchers.IO) {
         repository.getRole().collect {
             _roleState.emit(UiState.Loading)
+            Log.d("login", "getRole: $it")
             if (it.isNullOrBlank()) _roleState.emit(UiState.Empty)
             else _roleState.emit(UiState.Success(it))
         }
     }
 }
-
-//        _tokenState.collectLatest { token ->
-//            when (token) {
-//                is UiState.Success -> {
-//                    getRole()
-//                    _eventFlow.emit(UiEvents.NavigateEvent(Screen.Application.createRoute(token.data)))
-//                }
-//                is UiState.Empty -> {
-//                    _eventFlow.emit(UiEvents.NavigateEvent(Screen.Login.route))
-//                }
-//                is UiState.Error -> {
-//                    _eventFlow.emit(UiEvents.SnackBarEvent(token.error))
-//                }
-//                is UiState.Initial -> {
-//                    _eventFlow.emit(UiEvents.NavigateEvent(Screen.Login.route))
-//                }
-//                is UiState.Loading -> {
-//                    _eventFlow.emit(UiEvents.Loading)
-//                }
-//            }
-//        }

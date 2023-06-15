@@ -1,14 +1,12 @@
 package com.bangkit.c23pr492.talentease.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -28,7 +26,7 @@ fun TalentEaseApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     var token by rememberSaveable { mutableStateOf("") }
-    var role by rememberSaveable { mutableStateOf("") }
+    var role by remember { mutableStateOf("") }
     val strings: Set<String> = hashSetOf(
         Screen.Application.route,
         Screen.Position.route,
@@ -63,11 +61,21 @@ fun TalentEaseApp(
                         token = value
                     },
                     role = { value ->
+                        Log.d("login", "SplashScreen: $value")
                         role = value
                     }
                 )
             }
-            authNavGraph(navController)
+            authNavGraph(
+                navController,
+                token = { value ->
+                    token = value
+                },
+                role = { value ->
+                    Log.d("login", "authNavGraph: $value")
+                    role = value
+                }
+            )
             recruiterNavGraph(navController, role = { value ->
                 role = value
             })

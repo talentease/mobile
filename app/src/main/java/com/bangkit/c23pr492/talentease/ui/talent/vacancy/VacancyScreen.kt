@@ -53,7 +53,7 @@ fun VacancyScreen(
 ) {
     val listDataState = vacancyViewModel.listALlPositionState.collectAsState()
     var isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading, modifier = modifier)
+    LoadingProgressBar(isLoading = isLoading)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
@@ -62,6 +62,7 @@ fun VacancyScreen(
             token,
             vacancyViewModel
         )
+        Spacer(modifier = Modifier.padding(bottom = 8.dp))
         val listState = rememberLazyListState()
         listDataState.value.let { state ->
             when (state) {
@@ -163,7 +164,7 @@ fun VacancyContentScreen(
                     token,
                     position,
                     modifier = modifier
-                        .padding(all = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxWidth()
                         .animateItemPlacement(tween(durationMillis = 100)),
                     navigateToDetail = navigateToDetail
@@ -226,18 +227,18 @@ fun VacancyItems(
             navigateToDetail(token, vacancy.id)
         }
     ) {
-        Column(modifier = Modifier.padding(all = 8.dp)) {
+        Column(modifier = Modifier.padding(all = 16.dp)) {
             TitleText(
-                string = vacancy.title ?: "",
-                modifier = Modifier.padding(bottom = 12.dp)
+                string = vacancy.title ?: "Position Name",
+                modifier = Modifier.padding(bottom = 8.dp)
             )
             DescriptionText(
-                string = vacancy.company?.name ?: "",
-                modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
+                string = vacancy.description ?: "Description",
+                modifier = Modifier.padding(bottom = 12.dp)
             )
             RegularText(
-                string = vacancy.type ?: "",
-                modifier = Modifier.padding(start = 8.dp)
+                string = vacancy.deadline ?: "Info",
+                modifier = Modifier.padding()
             )
         }
     }

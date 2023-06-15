@@ -17,8 +17,9 @@ object Injection {
     fun provideAuthRepository(context: Context): AuthRepository {
         return AuthRepository.getInstance(
             FirebaseAuth.getInstance(),
-            AuthDataStore.getInstance(context.dataStore)
-        )
+            AuthDataStore.getInstance(context.dataStore),
+            ApiConfig.getApiService()
+            )
     }
 
     fun provideRecruiterRepository(context: Context): RecruiterRepository {

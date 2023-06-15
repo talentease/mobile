@@ -10,6 +10,8 @@ import com.bangkit.c23pr492.talentease.utils.Const.authGraphRoute
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
+    token: (String) -> Unit,
+    role: (String) -> Unit,
 ) {
     navigation(
         startDestination = Screen.Login.route,
@@ -20,6 +22,8 @@ fun NavGraphBuilder.authNavGraph(
         ) {
             LoginScreen(
                 navigateToHome = { route ->
+                    token(route.substringAfterLast("/"))
+                    role(route.substringBefore("/"))
                     navController.navigate(route) {
                         popUpTo(authGraphRoute) {
                             inclusive = true
@@ -28,7 +32,7 @@ fun NavGraphBuilder.authNavGraph(
                 },
                 navigateToRegister = {
                     navController.navigate(Screen.Register.route)
-                }
+                },
             )
         }
         composable(

@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +30,7 @@ fun SplashScreen(
                     is UiEvents.NavigateEvent -> {
                         token(event.route.substringAfterLast("/"))
                         role(event.route.substringBefore("/"))
+                        Log.d("login", "SplashScreen: $role")
                         navigate(event.route)
                     }
                 }
