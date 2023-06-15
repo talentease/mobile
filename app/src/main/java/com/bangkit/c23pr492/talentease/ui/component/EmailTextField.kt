@@ -19,7 +19,7 @@ import com.bangkit.c23pr492.talentease.utils.autofill
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EmailTextField(viewModel: AuthTextFieldViewModel) {
-    Box {
+    Box(modifier = Modifier.fillMaxWidth()) {
         TextField(
             value = viewModel.email,
             onValueChange = {

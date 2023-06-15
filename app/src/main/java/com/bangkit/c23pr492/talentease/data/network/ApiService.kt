@@ -61,6 +61,6 @@ interface ApiService {
     suspend fun applyPositions(
         @Header("Authorization") token: String,
         @Part("positionId") positionId: RequestBody,
-        @Part file: MultipartBody.Part,
+        @Part cv: MultipartBody.Part,
     ): ApplyApplicationResponse
 }

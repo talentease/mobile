@@ -103,7 +103,7 @@ fun DetailVacancyContentScreen(
             val requestImageFile = myFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
             Log.d("upload", "DetailVacancyContentScreen: req $requestImageFile")
             imageMultipart = MultipartBody.Part.createFormData(
-                "photo",
+                "cv",
                 myFile.name,
                 requestImageFile
             )

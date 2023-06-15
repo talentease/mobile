@@ -18,8 +18,7 @@ import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
 import com.bangkit.c23pr492.talentease.utils.Const.recruiterGraphRoute
 
 fun NavGraphBuilder.recruiterNavGraph(
-    navController: NavHostController,
-    role: (String) -> Unit
+    navController: NavHostController
 ) {
     navigation(
         startDestination = Screen.Application.route,
@@ -62,14 +61,6 @@ fun NavGraphBuilder.recruiterNavGraph(
                 token = token,
                 navigateToLogin = { route ->
                     navController.navigate(route) {
-                        popUpTo(recruiterGraphRoute) {
-                            inclusive = true
-                        }
-                    }
-                },
-                navigateToTalent = { navToken ->
-                    role("talent")
-                    navController.navigate(Screen.Vacancy.createRoute(navToken)) {
                         popUpTo(recruiterGraphRoute) {
                             inclusive = true
                         }

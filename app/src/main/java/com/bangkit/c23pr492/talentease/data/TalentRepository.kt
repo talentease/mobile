@@ -103,7 +103,7 @@ class TalentRepository(
             emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(tagRepository, "upload " + Log.getStackTraceString(e))
-            Log.e(tagRepository, "upload " + e.message)
+            Log.e(tagRepository, "upload " + e.message + e.cause)
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
     }.flowOn(Dispatchers.IO)

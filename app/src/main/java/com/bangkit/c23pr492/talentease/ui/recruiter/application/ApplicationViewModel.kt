@@ -54,7 +54,10 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
                             _listApplication.add(it.data)
                             Log.d("applicant", "getApplicationByPositionId: ${it.data}")
                             _applicationState.emit(UiState.Success(it.data))
-                        } else _applicationState.emit(UiState.Empty)
+                        } else {
+                            Log.d("applicant", "getApplicationByPositionId: data ne kosong")
+                            _applicationState.emit(UiState.Empty)
+                        }
                     }
                 }
             }

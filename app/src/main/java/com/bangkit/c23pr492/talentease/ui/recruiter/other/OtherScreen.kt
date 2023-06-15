@@ -24,7 +24,6 @@ fun OtherScreen(
         factory = AuthViewModelFactory.getInstance(LocalContext.current)
     ),
     navigateToLogin: (String) -> Unit,
-    navigateToTalent: (String) -> Unit
 ) {
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = true) {
@@ -48,13 +47,6 @@ fun OtherScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(
-            onClick = {
-                navigateToTalent(token)
-            }
-        ) {
-            Text(text = "Navigate to Talent")
-        }
         Button(
             onClick = {
                 authViewModel.logout()

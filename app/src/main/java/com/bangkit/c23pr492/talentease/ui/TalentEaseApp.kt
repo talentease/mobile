@@ -1,6 +1,5 @@
 package com.bangkit.c23pr492.talentease.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -61,7 +60,6 @@ fun TalentEaseApp(
                         token = value
                     },
                     role = { value ->
-                        Log.d("login", "SplashScreen: $value")
                         role = value
                     }
                 )
@@ -72,13 +70,10 @@ fun TalentEaseApp(
                     token = value
                 },
                 role = { value ->
-                    Log.d("login", "authNavGraph: $value")
                     role = value
                 }
             )
-            recruiterNavGraph(navController, role = { value ->
-                role = value
-            })
+            recruiterNavGraph(navController)
             talentNavGraph(navController)
         }
     }
