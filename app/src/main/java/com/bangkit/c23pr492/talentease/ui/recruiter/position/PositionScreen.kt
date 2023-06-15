@@ -38,7 +38,7 @@ fun PositionScreen(
         factory = AuthViewModelFactory.getInstance(context)
     ),
     positionViewModel: PositionViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance(context)
+        factory = RecruiterViewModelFactory.getInstance()
     ),
     navigateToDetail: (String, String) -> Unit,
     navigateToAdd: (String) -> Unit,

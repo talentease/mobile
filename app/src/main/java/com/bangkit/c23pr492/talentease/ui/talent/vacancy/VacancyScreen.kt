@@ -1,6 +1,7 @@
 package com.bangkit.c23pr492.talentease.ui.talent.vacancy
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -221,6 +222,7 @@ fun VacancyItems(
     modifier: Modifier = Modifier,
     navigateToDetail: (String, String) -> Unit
 ) {
+    Log.d("applicationId", "VacancyItems: ${vacancy.id}")
     Card(
         modifier = modifier,
         onClick = {

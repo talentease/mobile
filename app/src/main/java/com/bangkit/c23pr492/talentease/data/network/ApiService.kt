@@ -4,6 +4,8 @@ import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByIdMod
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationUpdateResponse
 import com.bangkit.c23pr492.talentease.data.model.application.ApplyApplicationResponse
+import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
+import com.bangkit.c23pr492.talentease.data.model.cv.PredictionResponse
 import com.bangkit.c23pr492.talentease.data.model.position.*
 import com.bangkit.c23pr492.talentease.data.model.profile.ProfileModel
 import okhttp3.MultipartBody
@@ -49,6 +51,12 @@ interface ApiService {
         @Path("applicationId") id: String,
         @Body status: StatusModel
     ): ApplicationUpdateResponse
+
+    @POST("prediction")
+    suspend fun summarizeCv(
+        @Header("Authorization") token: String,
+        @Body id: PredictionModel
+    ): PredictionResponse
 
     @POST("position")
     suspend fun uploadPosition(

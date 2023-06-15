@@ -20,7 +20,7 @@ object File {
 
     private fun createTempFile(context: Context): File {
         val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(timeStamp, ".jpeg", storageDir)
+        return File.createTempFile(timeStamp, ".pdf", storageDir)
     }
 
     fun uriToFile(selectedImg: Uri, context: Context): File {

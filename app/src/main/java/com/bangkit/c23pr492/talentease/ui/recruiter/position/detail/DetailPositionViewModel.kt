@@ -34,7 +34,8 @@ class DetailPositionViewModel(private val repository: RecruiterRepository): View
                         description = resource.data.description.toString()
                         salary = resource.data.salary.toString()
                         type = resource.data.type.toString()
-                        deadline = resource.data.deadline.toString()
+                        date = resource.data.deadline.toString().substringBefore("T")
+                        time = resource.data.deadline.toString().substringAfter("T").substringBefore("Z")
                         _detailPositionState.emit(UiState.Success(resource.data))
                     }
                     is Resource.Error -> {
@@ -85,6 +86,20 @@ class DetailPositionViewModel(private val repository: RecruiterRepository): View
 
     fun updateType(input: String) {
         type = input
+    }
+
+    var date by mutableStateOf("")
+        private set
+
+    fun updateDate(input: String) {
+        date = input
+    }
+
+    var time by mutableStateOf("")
+        private set
+
+    fun updateTime(input: String) {
+        time = input
     }
 
     var deadline by mutableStateOf("")

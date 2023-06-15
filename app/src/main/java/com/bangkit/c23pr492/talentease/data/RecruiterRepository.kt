@@ -1,7 +1,7 @@
 package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
-import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
+import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
 import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.data.model.position.PositionModel
 import com.bangkit.c23pr492.talentease.data.model.position.StatusModel
@@ -15,12 +15,13 @@ import kotlinx.coroutines.flow.flowOn
 
 class RecruiterRepository(
     private val apiService: ApiService,
-    private val mTalentEaseDao: TalentEaseDao
+    private val mlService: ApiService
 ) {
     fun getApplicationByPositionId(token: String, positionId: String) = flow {
         emit(Resource.Loading)
         try {
-            val response = apiService.getApplicationByPositionId(generateBearerToken(token), positionId)
+            val response =
+                apiService.getApplicationByPositionId(generateBearerToken(token), positionId)
             Log.d(Const.tagRepository, response.toString())
             emit(Resource.Success(response))
         } catch (e: Exception) {
@@ -32,7 +33,7 @@ class RecruiterRepository(
     fun getDetailApplicationById(token: String, applicationId: String) = flow {
         emit(Resource.Loading)
         try {
-            val response = apiService.getApplicationById(token, applicationId)
+            val response = apiService.getApplicationById(generateBearerToken(token), applicationId)
             emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(Const.tagRepository, Log.getStackTraceString(e))
@@ -43,13 +44,26 @@ class RecruiterRepository(
     fun updateApplication(token: String, applicationId: String, status: StatusModel) = flow {
         emit(Resource.Loading)
         try {
-            val response = apiService.updateApplication(token, applicationId, status)
+            val response =
+                apiService.updateApplication(generateBearerToken(token), applicationId, status)
             emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(Const.tagRepository, Log.getStackTraceString(e))
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
     }
+
+    fun summarizeCv(token: String, id: PredictionModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = mlService.summarizeCv(generateBearerToken(token), id)
+            Log.d(Const.tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
 
     fun getAllPositions(token: String): Flow<Resource<List<PositionItemModel>?>> = flow {
         emit(Resource.Loading)
@@ -85,7 +99,8 @@ class RecruiterRepository(
     fun getPositionByPositionID(token: String, positionId: String) = flow {
         emit(Resource.Loading)
         try {
-            val response = apiService.getPositionByPositionId(generateBearerToken(token), positionId)
+            val response =
+                apiService.getPositionByPositionId(generateBearerToken(token), positionId)
             Log.d(Const.tagRepository, response.toString())
             emit(Resource.Success(response.data))
         } catch (e: Exception) {
@@ -109,7 +124,8 @@ class RecruiterRepository(
     fun updatePosition(token: String, positionId: String, position: PositionModel) = flow {
         emit(Resource.Loading)
         try {
-            val response = apiService.updatePosition(generateBearerToken(token), positionId, position)
+            val response =
+                apiService.updatePosition(generateBearerToken(token), positionId, position)
             Log.d(Const.tagRepository, "update: $response")
             emit(Resource.Success(response))
         } catch (e: Exception) {
@@ -131,9 +147,9 @@ class RecruiterRepository(
         private var instance: RecruiterRepository? = null
         fun getInstance(
             apiService: ApiService,
-            mTalentEaseDao: TalentEaseDao
+            mlService: ApiService
         ): RecruiterRepository = instance ?: synchronized(this) {
-            instance ?: RecruiterRepository(apiService, mTalentEaseDao)
+            instance ?: RecruiterRepository(apiService, mlService)
         }.also { instance = it }
     }
 }

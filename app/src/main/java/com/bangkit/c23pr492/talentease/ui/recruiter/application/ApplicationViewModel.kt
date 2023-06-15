@@ -33,6 +33,7 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
     fun getAllPositions(token: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAllPositions(token).collect {
+                dataItem.clear()
                 when (it) {
                     Resource.Loading -> _listApplicationState.emit(UiState.Loading)
                     is Resource.Success -> {
@@ -49,10 +50,7 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
                                         is Resource.Success -> {
                                             application.data.data.forEach { item ->
                                                 addItem(item)
-                                                Log.d(
-                                                    "kenapa",
-                                                    "getApplicationByPositionId: ${item.id}"
-                                                )
+                                                Log.d("applicationId", "ViewModel: ${item.positionId}")
                                             }
                                         }
                                     }

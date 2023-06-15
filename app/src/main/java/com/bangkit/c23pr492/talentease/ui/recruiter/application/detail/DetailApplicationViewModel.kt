@@ -1,11 +1,16 @@
 package com.bangkit.c23pr492.talentease.ui.recruiter.application.detail
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.data.Resource
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByIdModel
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationUpdateResponse
+import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
+import com.bangkit.c23pr492.talentease.data.model.cv.PredictionResponse
 import com.bangkit.c23pr492.talentease.data.model.position.StatusModel
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +27,23 @@ class DetailApplicationViewModel(private val repository: RecruiterRepository) : 
         MutableStateFlow<UiState<ApplicationUpdateResponse>>(UiState.Initial)
     val updateState = _updateState.asStateFlow()
 
+    var summarize by mutableStateOf(false)
+        private set
+
+    fun updateSummarize(input: Boolean) {
+        summarize = input
+    }
+
+    var isLoading by mutableStateOf(false)
+        private set
+
+    fun loading(input: Boolean) {
+        summarize = input
+    }
+
+    private val _summarizeState =
+        MutableStateFlow<UiState<PredictionResponse>>(UiState.Initial)
+    val summarizeState = _summarizeState.asStateFlow()
 
     fun getDetailApplicationById(token: String, applicationId: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -46,6 +68,18 @@ class DetailApplicationViewModel(private val repository: RecruiterRepository) : 
                     Resource.Loading -> _updateState.emit(UiState.Loading)
                     is Resource.Error -> _updateState.emit(UiState.Error(it.error))
                     is Resource.Success -> _updateState.emit(UiState.Success(it.data))
+                }
+            }
+        }
+    }
+
+    fun summarizeCv(token: String, id: PredictionModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.summarizeCv(token, id).collect {
+                when (it) {
+                    Resource.Loading -> _summarizeState.emit(UiState.Loading)
+                    is Resource.Error -> _summarizeState.emit(UiState.Error(it.error))
+                    is Resource.Success -> _summarizeState.emit(UiState.Success(it.data))
                 }
             }
         }

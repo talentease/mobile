@@ -33,7 +33,7 @@ fun AddPositionScreen(
     context: Context = LocalContext.current,
     modifier: Modifier = Modifier,
     addPositionViewModel: AddPositionViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance(context)
+        factory = RecruiterViewModelFactory.getInstance()
     ),
     navigateToPosition: (String) -> Unit,
 ) {

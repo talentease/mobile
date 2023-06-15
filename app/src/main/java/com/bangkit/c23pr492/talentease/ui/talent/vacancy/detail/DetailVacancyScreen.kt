@@ -93,21 +93,21 @@ fun DetailVacancyContentScreen(
     navigateToApplication: (String) -> Unit
 ) {
     val context = LocalContext.current
-    var imageMultipart: MultipartBody.Part? = null
+    var cvMultipart: MultipartBody.Part? = null
     val pickFileLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val selectedFile: Uri = result.data?.data as Uri
             val myFile = uriToFile(selectedFile, context)
-            val requestImageFile = myFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-            Log.d("upload", "DetailVacancyContentScreen: req $requestImageFile")
-            imageMultipart = MultipartBody.Part.createFormData(
+            val requestPdfFile = myFile.asRequestBody("application/pdf".toMediaTypeOrNull())
+            Log.d("upload", "DetailVacancyContentScreen: req $requestPdfFile")
+            cvMultipart = MultipartBody.Part.createFormData(
                 "cv",
                 myFile.name,
-                requestImageFile
+                requestPdfFile
             )
-            Log.d("upload", "DetailVacancyContentScreen: imp $imageMultipart")
+            Log.d("upload", "DetailVacancyContentScreen: imp $cvMultipart")
         }
     }
     LaunchedEffect(key1 = true) {
@@ -145,8 +145,8 @@ fun DetailVacancyContentScreen(
             onClick = {
                 val intent = Intent()
                 intent.action = Intent.ACTION_GET_CONTENT
-                intent.type = "image/jpeg"
-                val chooser = Intent.createChooser(intent, "Choose a Picture")
+                intent.type = "application/pdf"
+                val chooser = Intent.createChooser(intent, "Choose a Pdf")
                 pickFileLauncher.launch(chooser)
             }
         ) {
@@ -154,7 +154,7 @@ fun DetailVacancyContentScreen(
         }
         Button(
             onClick = {
-                imageMultipart?.let { detailVacancyViewModel.applyPosition(token, position.id, it) }
+                cvMultipart?.let { detailVacancyViewModel.applyPosition(token, position.id, it) }
             }
         ) {
             Text(text = "Apply Now")

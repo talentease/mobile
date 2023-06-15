@@ -10,7 +10,6 @@ import com.bangkit.c23pr492.talentease.ui.talent.application.TalentApplicationSc
 import com.bangkit.c23pr492.talentease.ui.talent.profile.ProfileScreen
 import com.bangkit.c23pr492.talentease.ui.talent.vacancy.VacancyScreen
 import com.bangkit.c23pr492.talentease.ui.talent.vacancy.detail.DetailVacancyScreen
-import com.bangkit.c23pr492.talentease.utils.Const
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyPosition
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
 import com.bangkit.c23pr492.talentease.utils.Const.talentGraphRoute
@@ -52,7 +51,7 @@ fun NavGraphBuilder.talentNavGraph(
                 token = token,
                 navigateToLogin = { route ->
                     navController.navigate(route) {
-                        popUpTo(Const.recruiterGraphRoute) {
+                        popUpTo(talentGraphRoute) {
                             inclusive = true
                         }
                     }

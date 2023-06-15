@@ -26,6 +26,7 @@ android {
         properties.load(project.rootProject.file("local.properties").newDataInputStream())
 
         buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL")}\"")
+        buildConfigField("String", "ML_URL", "\"${properties.getProperty("ML_URL")}\"")
     }
 
     buildTypes {

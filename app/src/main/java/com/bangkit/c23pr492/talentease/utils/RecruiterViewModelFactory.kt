@@ -1,6 +1,5 @@
 package com.bangkit.c23pr492.talentease.utils
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.bangkit.c23pr492.talentease.data.RecruiterRepository
@@ -40,9 +39,9 @@ class RecruiterViewModelFactory private constructor(private val repository: Recr
     companion object {
         @Volatile
         private var instance: RecruiterViewModelFactory? = null
-        fun getInstance(context: Context): RecruiterViewModelFactory =
+        fun getInstance(): RecruiterViewModelFactory =
             instance ?: synchronized(this) {
-                instance ?: RecruiterViewModelFactory(Injection.provideRecruiterRepository(context))
+                instance ?: RecruiterViewModelFactory(Injection.provideRecruiterRepository())
             }.also { instance = it }
     }
 }

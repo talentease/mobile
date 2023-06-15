@@ -3,6 +3,7 @@ package com.bangkit.c23pr492.talentease.ui.recruiter.application.detail
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByIdModel
+import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
+import com.bangkit.c23pr492.talentease.data.model.position.StatusModel
+import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
 import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
@@ -39,14 +43,16 @@ fun DetailRecruiterApplicationScreen(
     applicationId: String,
     context: Context = LocalContext.current,
     detailApplicationViewModel: DetailApplicationViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance(context)
+        factory = RecruiterViewModelFactory.getInstance()
     ),
 ) {
     val emailAddress = "a200dkx4783@bangkit.academy"
     val listState = rememberLazyListState()
 //    var emailSubject by rememberSaveable { mutableStateOf("") }
 //    var emailBody by rememberSaveable { mutableStateOf("") }
+    Log.d("coba", "DetailRecruiterApplicationScreen: $applicationId")
     val applicationState = detailApplicationViewModel.applicationState.collectAsState()
+    LoadingProgressBar(isLoading = detailApplicationViewModel.isLoading)
     applicationState.value.let {
         when (it) {
             UiState.Empty -> {}
@@ -58,10 +64,12 @@ fun DetailRecruiterApplicationScreen(
             UiState.Loading -> {}
             is UiState.Success -> {
                 DetailApplicationContentScreen(
-                    context = context,
+                    token = token,
                     emailAddress = emailAddress,
                     application = it.data,
-                    listState = listState
+                    context = context,
+                    listState = listState,
+                    detailApplicationViewModel = detailApplicationViewModel
                 )
             }
         }
@@ -108,13 +116,15 @@ fun DetailRecruiterApplicationScreen(
 
 @Composable
 fun DetailApplicationContentScreen(
-    context: Context,
+    token: String,
     emailAddress: String,
     application: ApplicationByIdModel,
+    context: Context,
+    listState: LazyListState = rememberLazyListState(),
+    detailApplicationViewModel: DetailApplicationViewModel,
     modifier: Modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp),
-    listState: LazyListState = rememberLazyListState()
+        .padding(16.dp)
 ) {
     Scaffold(
         modifier = modifier,
@@ -137,23 +147,23 @@ fun DetailApplicationContentScreen(
         ) {
             application.data.apply {
                 //deskripsi posisi
-                Card(modifier.padding(16.dp)) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row {
+                Card(Modifier.fillMaxWidth()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Apartment,
                                 contentDescription = "Company"
                             )
-                            Column {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(text = position.title)
                                 Text(text = position.company.address)
                             }
                         }
-                        Row {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(imageVector = Icons.Default.Work, contentDescription = "work type")
                             Text(text = position.type)
                         }
-                        Row {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(
                                 imageVector = Icons.Default.RequestQuote,
                                 contentDescription = "salary"
@@ -164,23 +174,23 @@ fun DetailApplicationContentScreen(
                     }
                 }
                 //data diri talent
-                Card(modifier.padding(16.dp)) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row {
+                Card(Modifier.fillMaxWidth()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Face,
                                 contentDescription = "Talent"
                             )
                             Text(text = "${candidate.firstName}  ${candidate.lastName}")
                         }
-                        Row {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Call,
                                 contentDescription = "Contact"
                             )
                             Text(text = candidate.phoneNumber)
                         }
-                        Row {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Attachment,
                                 contentDescription = "CV"
@@ -189,41 +199,102 @@ fun DetailApplicationContentScreen(
                         }
                     }
                 }
-            }
-
-            //CV Talent
-            Card(modifier.padding(16.dp)) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(text = "Talent Education")
-                    Text(text = "Talent Skills")
-                    Text(text = "Talent Experience")
-                    Text(text = "Talent Certification")
-                    Text(text = "Talent Award")
-                    Text(text = "Talent Publication")
-                }
-            }
-            //Status
-            val statusList: List<String> = listOf(
-                "Pending",
-                "Screening",
-                "Interview",
-                "Accept",
-                "Reject",
-                "Active",
-                "Expired",
-            )
-            var selected by rememberSaveable { mutableStateOf("") }
-            LazyRow(state = listState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(statusList, key = { it }) { status ->
-                    Chip(
-                        title = status,
-                        selected = selected,
-                        onSelected = {
-                            selected = it
+                detailApplicationViewModel.apply {
+                    Button(
+                        onClick = {
+                            if (summarize) {
+                                updateSummarize(false)
+                            } else {
+                                summarizeCv(token, PredictionModel(id))
+                                updateSummarize(true)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            if (summarize) {
+                                Text(text = "Hide Summary")
+                                Icon(imageVector = Icons.Default.ExpandLess, contentDescription = "Hide")
+                            } else {
+                                Text(text = "Summarize Cv")
+                                Icon(imageVector = Icons.Default.ExpandMore, contentDescription = "Show")
+                            }
                         }
-                    )
+                    }
+                    if (summarize) {
+                        summarizeState.value.let {
+                            when(it) {
+                                UiState.Empty -> loading(false)
+                                is UiState.Error -> loading(false)
+                                UiState.Initial -> loading(false)
+                                UiState.Loading -> loading(true)
+                                is UiState.Success -> {
+                                    Card(Modifier.fillMaxWidth()) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
+                                            it.data.summary?.let { summary ->
+                                                OutlinedTextField(
+                                                    value = summary,
+                                                    onValueChange = {},
+                                                    label = {
+                                                        Text(text = "Skills")
+                                                    },
+                                                    singleLine = false,
+                                                    readOnly = true
+                                                )
+                                            }
+                                            it.data.skills?.let { skills ->
+                                                OutlinedTextField(
+                                                    value = skills.joinToString(" , "),
+                                                    onValueChange = {},
+                                                    label = {
+                                                        Text(text = "Skills")
+                                                    },
+                                                    singleLine = false,
+                                                    readOnly = true
+                                                )
+                                            }
+                                            it.data.experience?.let { experience ->
+                                                OutlinedTextField(
+                                                    value = experience.joinToString(" , "),
+                                                    onValueChange = {},
+                                                    label = {
+                                                        Text(text = "Experience")
+                                                    },
+                                                    singleLine = false,
+                                                    readOnly = true
+                                                )
+                                            }
+                                        }
+                                    }
+                                    loading(false)
+                                }
+                            }
+                        }
+                    }
                 }
-                item { }
+                //Status
+                val statusList: List<String> = listOf("Pending", "Screening", "Interview", "Accept", "Reject", "Active", "Expired",)
+                var selected by rememberSaveable { mutableStateOf(status) }
+                LazyRow(state = listState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(statusList, key = { it }) { status ->
+                        Chip(
+                            title = status,
+                            selected = selected,
+                            onSelected = {
+                                selected = it
+                            }
+                        )
+                    }
+                    item { }
+                }
+                Button(
+                    onClick = {
+                        detailApplicationViewModel.updateStatus(token, id, StatusModel(selected))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Save Changes")
+                }
             }
         }
     }
@@ -235,7 +306,7 @@ fun Chip(
     selected: String,
     onSelected: (String) -> Unit
 ) {
-    val isSelected = selected == title
+    val isSelected = selected.contains(title, ignoreCase = true)
 //    var surfaceColor: Color
     var contentColor: Color
     var boxModifier: Modifier
@@ -272,7 +343,7 @@ fun Chip(
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = "check",
-                    tint = Color.White,
+                    tint = contentColor,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }

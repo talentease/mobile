@@ -22,12 +22,10 @@ object Injection {
             )
     }
 
-    fun provideRecruiterRepository(context: Context): RecruiterRepository {
-        val database = TalentEaseDatabase.getDatabase(context)
-        val dao = database.talentEaseDao()
+    fun provideRecruiterRepository(): RecruiterRepository {
         return RecruiterRepository.getInstance(
             ApiConfig.getApiService(),
-            dao
+            ApiConfig.getMLApiService()
         )
     }
 

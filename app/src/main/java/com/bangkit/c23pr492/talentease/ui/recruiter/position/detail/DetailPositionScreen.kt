@@ -5,6 +5,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -35,7 +37,7 @@ fun DetailPositionScreen(
     context: Context = LocalContext.current,
     modifier: Modifier = Modifier,
     detailPositionViewModel: DetailPositionViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance(context)
+        factory = RecruiterViewModelFactory.getInstance()
     ),
 ) {
     Log.d("position", "DetailPositionScreen: $positionId")
@@ -84,7 +86,7 @@ fun DetailPositionContentScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(16.dp)
         ) {
-            Card {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(8.dp)
@@ -106,9 +108,6 @@ fun DetailPositionContentScreen(
                         label = {
                             Text(text = "Position Name")
                         },
-                        placeholder = {
-                            Text(text = name)
-                        },
                         readOnly = readOnly,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
@@ -122,8 +121,8 @@ fun DetailPositionContentScreen(
                         onValueChange = {
                             updateDescription(it)
                         },
-                        placeholder = {
-                            Text(text = description)
+                        label = {
+                            Text(text = "Description")
                         },
                         readOnly = readOnly,
                         keyboardOptions = KeyboardOptions(
@@ -140,13 +139,13 @@ fun DetailPositionContentScreen(
                                 onValueChange = {
                                     updateSalary(it)
                                 },
-                                placeholder = {
-                                    Text(text = salary)
+                                label = {
+                                    Text(text = "Salary")
                                 },
                                 readOnly = readOnly,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
-                                    imeAction = ImeAction.Next
+                                    imeAction = ImeAction.Done
                                 ),
                                 singleLine = true
                             )
@@ -156,14 +155,10 @@ fun DetailPositionContentScreen(
                                 OutlinedTextField(
                                     value = type,
                                     onValueChange = {},
-                                    placeholder = {
-                                        Text(text = type)
+                                    label = {
+                                        Text(text = "Type")
                                     },
                                     readOnly = true,
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                        imeAction = ImeAction.Next
-                                    ),
                                     singleLine = true
                                 )
                             } else {
@@ -172,42 +167,77 @@ fun DetailPositionContentScreen(
                         }
                     }
                     if (readOnly) {
-                        OutlinedTextField(
-                            value = deadline,
-                            onValueChange = { },
-                            placeholder = {
-                                Text(text = deadline)
-                            },
-                            readOnly = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next
-                            ),
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                OutlinedTextField(
+                                    value = date,
+                                    onValueChange = { },
+                                    label = {
+                                        Text(text = "Date")
+                                    },
+                                    readOnly = true,
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            Box(modifier = Modifier.weight(1f)) {
+                                OutlinedTextField(
+                                    value = time,
+                                    onValueChange = { },
+                                    label = {
+                                        Text(text = "Time")
+                                    },
+                                    readOnly = true,
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
                     } else {
                         DateTimepicker(detailPositionViewModel = this@apply)
                     }
                 }
             }
-            Button(
-                onClick = {
-                    readOnly = if (readOnly) {
-                        false
-                    } else {
-                        detailPositionViewModel.apply {
-                            updatePositionModel(name, description, salary.toInt(), type, deadline)
-                            updatePosition(token, positionId, this.position)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = {
+                        readOnly = if (readOnly) {
+                            false
+                        } else {
+                            detailPositionViewModel.apply {
+                                updatePositionModel(
+                                    name,
+                                    description,
+                                    salary.toInt(),
+                                    type,
+                                    deadline
+                                )
+                                updatePosition(token, positionId, this.position)
+                            }
+                            true
                         }
-                        true
+                    },
+                    modifier = Modifier.weight(72f)
+                ) {
+                    if (readOnly) {
+                        Text(text = "Edit Position")
+                    } else {
+                        Text(text = "Save Changes")
                     }
                 }
-            ) {
-                if (readOnly) {
-                    Text(text = "Edit Position")
-                } else {
-                    Text(text = "Save Changes")
+                if (!readOnly) {
+                    Button(
+                        onClick = {
+                            readOnly = true
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        modifier = Modifier.weight(21f)
+                    ) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "Cancel")
+                    }
                 }
             }
         }
