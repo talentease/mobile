@@ -50,7 +50,7 @@ fun ApplicationScreen(
     applicationViewModel: ApplicationViewModel = viewModel(
         factory = RecruiterViewModelFactory.getInstance(context)
     ),
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String, String) -> Unit
 ) {
     val listApplicationState = applicationViewModel.listApplicationState.collectAsState()
 
@@ -147,7 +147,7 @@ fun ApplicationContentScreen(
     listState: LazyListState = rememberLazyListState(),
     data: MutableList<DataItem>,
     modifier: Modifier = Modifier,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String, String) -> Unit
 ) {
     Log.d("apprepo", "ApplicationContentScreen: final $data")
     Box(modifier = modifier) {
@@ -199,17 +199,17 @@ fun ApplicationItems(
     token: String,
     application: DataItem,
     modifier: Modifier = Modifier,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (String, String) -> Unit,
 ) {
     application.apply {
         Card(
-            modifier = modifier.clickable { navigateToDetail(token) }
+            modifier = modifier.clickable { navigateToDetail(token, positionId) }
         ) {
             Column(modifier = Modifier
                 .padding(all = 16.dp)
                 .fillMaxWidth()) {
                 TitleText(
-                    string = candidate.firstName + candidate.lastName,
+                    string = "${candidate.firstName}  ${candidate.lastName}",
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 DescriptionText(

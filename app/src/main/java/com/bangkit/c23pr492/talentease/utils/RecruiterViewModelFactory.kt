@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.di.Injection
 import com.bangkit.c23pr492.talentease.ui.recruiter.application.ApplicationViewModel
+import com.bangkit.c23pr492.talentease.ui.recruiter.application.detail.DetailApplicationViewModel
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionViewModel
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionViewModel
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.detail.DetailPositionViewModel
@@ -27,7 +28,9 @@ class RecruiterViewModelFactory private constructor(private val repository: Recr
             modelClass.isAssignableFrom(DetailPositionViewModel::class.java) -> return DetailPositionViewModel(
                 repository
             ) as T
-//            modelClass.isAssignableFrom(UploadViewModel::class.java) -> return UploadViewModel(repository) as T
+            modelClass.isAssignableFrom(DetailApplicationViewModel::class.java) -> return DetailApplicationViewModel(
+                repository
+            ) as T
 //            modelClass.isAssignableFrom(SettingViewModel::class.java) -> return SettingViewModel(repository) as T
 //            modelClass.isAssignableFrom(MapsViewModel::class.java) -> return MapsViewModel(repository) as T
         }

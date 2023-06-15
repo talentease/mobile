@@ -13,6 +13,7 @@ import com.bangkit.c23pr492.talentease.ui.recruiter.other.OtherScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.PositionScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.add.AddPositionScreen
 import com.bangkit.c23pr492.talentease.ui.recruiter.position.detail.DetailPositionScreen
+import com.bangkit.c23pr492.talentease.utils.Const.navKeyApplication
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyPosition
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
 import com.bangkit.c23pr492.talentease.utils.Const.recruiterGraphRoute
@@ -31,8 +32,8 @@ fun NavGraphBuilder.recruiterNavGraph(
             val token = it.arguments?.getString(navKeyToken) ?: ""
             ApplicationScreen(
                 token = token,
-                navigateToDetail = { navToken ->
-                    navController.navigate(Screen.DetailRecruiterApplication.createRoute(navToken))
+                navigateToDetail = { navToken, navApplication ->
+                    navController.navigate(Screen.DetailRecruiterApplication.createRoute(navToken, navApplication))
                 }
             )
         }
@@ -70,11 +71,16 @@ fun NavGraphBuilder.recruiterNavGraph(
         }
         composable(
             route = Screen.DetailRecruiterApplication.route,
-            arguments = listOf(navArgument(navKeyToken) { type = NavType.StringType }),
+            arguments = listOf(
+                navArgument(navKeyToken) { type = NavType.StringType },
+                navArgument(navKeyApplication) { type = NavType.StringType }
+            ),
         ) {
             val token = it.arguments?.getString(navKeyToken) ?: ""
+            val applicationId = it.arguments?.getString(navKeyApplication) ?: ""
             DetailRecruiterApplicationScreen(
                 token = token,
+                applicationId = applicationId
             )
         }
         composable(

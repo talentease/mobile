@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.ui.navigation
 
+import com.bangkit.c23pr492.talentease.utils.Const.navKeyApplication
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyPosition
 import com.bangkit.c23pr492.talentease.utils.Const.navKeyToken
 
@@ -17,8 +18,8 @@ sealed class Screen(val route: String) {
     object Other : Screen("recruiter/other/{$navKeyToken}") {
         fun createRoute(token: String) = "recruiter/other/$token"
     }
-    object DetailRecruiterApplication : Screen("recruiter/application/detail/{$navKeyToken}") {
-        fun createRoute(token: String) = "recruiter/application/detail/$token"
+    object DetailRecruiterApplication : Screen("recruiter/application/detail/{$navKeyToken}&{$navKeyApplication}") {
+        fun createRoute(token: String, applicationId: String) = "recruiter/application/detail/$token&$applicationId"
     }
     object DetailPosition : Screen("recruiter/position/detail/{$navKeyToken}&{$navKeyPosition}") {
         fun createRoute(token: String, positionId: String) = "recruiter/position/detail/$token&$positionId"

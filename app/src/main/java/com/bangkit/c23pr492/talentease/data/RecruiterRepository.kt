@@ -4,6 +4,7 @@ import android.util.Log
 import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
 import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.data.model.position.PositionModel
+import com.bangkit.c23pr492.talentease.data.model.position.StatusModel
 import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const
 import com.bangkit.c23pr492.talentease.utils.UiText
@@ -20,11 +21,32 @@ class RecruiterRepository(
         emit(Resource.Loading)
         try {
             val response = apiService.getApplicationByPositionId(generateBearerToken(token), positionId)
-            Log.d("apprepos", positionId)
-            Log.d("apprepos", response.toString())
+            Log.d(Const.tagRepository, response.toString())
             emit(Resource.Success(response))
         } catch (e: Exception) {
-            Log.e("apprepox", Log.getStackTraceString(e))
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }
+
+    fun getDetailApplicationById(token: String, applicationId: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getApplicationById(token, applicationId)
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }
+
+    fun updateApplication(token: String, applicationId: String, status: StatusModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.updateApplication(token, applicationId, status)
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
     }

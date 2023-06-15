@@ -8,18 +8,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,21 +26,96 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByIdModel
+import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.ui.theme.TalentEaseTheme
+import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
 
 
 @Composable
 fun DetailRecruiterApplicationScreen(
     token: String,
+    applicationId: String,
     context: Context = LocalContext.current,
-    modifier: Modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
+    detailApplicationViewModel: DetailApplicationViewModel = viewModel(
+        factory = RecruiterViewModelFactory.getInstance(context)
+    ),
 ) {
     val emailAddress = "a200dkx4783@bangkit.academy"
     val listState = rememberLazyListState()
 //    var emailSubject by rememberSaveable { mutableStateOf("") }
 //    var emailBody by rememberSaveable { mutableStateOf("") }
+    val applicationState = detailApplicationViewModel.applicationState.collectAsState()
+    applicationState.value.let {
+        when (it) {
+            UiState.Empty -> {}
+            is UiState.Error -> {}
+            UiState.Initial -> detailApplicationViewModel.getDetailApplicationById(
+                token,
+                applicationId
+            )
+            UiState.Loading -> {}
+            is UiState.Success -> {
+                DetailApplicationContentScreen(
+                    context = context,
+                    emailAddress = emailAddress,
+                    application = it.data,
+                    listState = listState
+                )
+            }
+        }
+    }
+
+//        OutlinedTextField(
+//            value = emailSubject,
+//            onValueChange = {
+//                emailSubject = it
+//            },
+//            label = {
+//                Text(text = "Email Subject")
+//            }
+//        )
+//        OutlinedTextField(
+//            value = emailBody,
+//            onValueChange = {
+//                emailBody = it
+//            },
+//            label = {
+//                Text(text = "Email Body")
+//            }
+//        )
+//            Button(
+//                onClick = {
+//                val uri = Uri.parse("mailto:$emailAddress")
+//                    .buildUpon()
+//                    .appendQueryParameter("subject", emailSubject)
+//                    .appendQueryParameter("body", emailBody)
+//                    .build()
+//
+//                val emailIntent = Intent(Intent.ACTION_SENDTO, uri)
+//                context.startActivity(Intent.createChooser(emailIntent, "Email via..."))
+//                    val intent = Intent(Intent.ACTION_SENDTO).apply {
+//                        data = Uri.parse("mailto:$emailAddress")
+//                    }
+//                    context.startActivity(intent)
+//                }
+//            ) {
+//                Text(text = "Update")
+//            }
+
+}
+
+@Composable
+fun DetailApplicationContentScreen(
+    context: Context,
+    emailAddress: String,
+    application: ApplicationByIdModel,
+    modifier: Modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp),
+    listState: LazyListState = rememberLazyListState()
+) {
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
@@ -61,31 +133,67 @@ fun DetailRecruiterApplicationScreen(
     ) { innerPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(innerPadding).padding(20.dp)
+            modifier = Modifier.padding(innerPadding)
         ) {
-            //deskripsi posisi
-            Card {
-                Column {
-                    Text(text = "Position Name")
-                    Text(text = "Location")
-                    Text(text = "Type")
-                    Text(text = "Salary")
-                    Text(text = "Desc")
+            application.data.apply {
+                //deskripsi posisi
+                Card(modifier.padding(16.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Apartment,
+                                contentDescription = "Company"
+                            )
+                            Column {
+                                Text(text = position.title)
+                                Text(text = position.company.address)
+                            }
+                        }
+                        Row {
+                            Icon(imageVector = Icons.Default.Work, contentDescription = "work type")
+                            Text(text = position.type)
+                        }
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.RequestQuote,
+                                contentDescription = "salary"
+                            )
+                            Text(text = position.salary.toString())
+                        }
+                        Text(text = position.description)
+                    }
+                }
+                //data diri talent
+                Card(modifier.padding(16.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Face,
+                                contentDescription = "Talent"
+                            )
+                            Text(text = "${candidate.firstName}  ${candidate.lastName}")
+                        }
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Call,
+                                contentDescription = "Contact"
+                            )
+                            Text(text = candidate.phoneNumber)
+                        }
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Attachment,
+                                contentDescription = "CV"
+                            )
+                            Text(text = cv)
+                        }
+                    }
                 }
             }
-            //data diri talent
-            Card {
-                Column {
-                    Text(text = "Talent Name")
-                    Text(text = "Talent Age")
-                    Text(text = "Talent Location")
-                    Text(text = "Talent Contact")
-                    Text(text = "CV Link")
-                }
-            }
+
             //CV Talent
-            Card {
-                Column {
+            Card(modifier.padding(16.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(text = "Talent Education")
                     Text(text = "Talent Skills")
                     Text(text = "Talent Experience")
@@ -117,42 +225,6 @@ fun DetailRecruiterApplicationScreen(
                 }
                 item { }
             }
-//        OutlinedTextField(
-//            value = emailSubject,
-//            onValueChange = {
-//                emailSubject = it
-//            },
-//            label = {
-//                Text(text = "Email Subject")
-//            }
-//        )
-//        OutlinedTextField(
-//            value = emailBody,
-//            onValueChange = {
-//                emailBody = it
-//            },
-//            label = {
-//                Text(text = "Email Body")
-//            }
-//        )
-//            Button(
-//                onClick = {
-////                val uri = Uri.parse("mailto:$emailAddress")
-////                    .buildUpon()
-////                    .appendQueryParameter("subject", emailSubject)
-////                    .appendQueryParameter("body", emailBody)
-////                    .build()
-////
-////                val emailIntent = Intent(Intent.ACTION_SENDTO, uri)
-////                context.startActivity(Intent.createChooser(emailIntent, "Email via..."))
-//                    val intent = Intent(Intent.ACTION_SENDTO).apply {
-//                        data = Uri.parse("mailto:$emailAddress")
-//                    }
-//                    context.startActivity(intent)
-//                }
-//            ) {
-//                Text(text = "Update")
-//            }
         }
     }
 }
@@ -219,6 +291,6 @@ fun Chip(
 @Composable
 fun DetailApplicationScreenPreview() {
     TalentEaseTheme {
-        DetailRecruiterApplicationScreen(token = "")
+//        DetailRecruiterApplicationScreen(token = "")
     }
 }

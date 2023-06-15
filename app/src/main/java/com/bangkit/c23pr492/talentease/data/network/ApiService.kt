@@ -1,5 +1,6 @@
 package com.bangkit.c23pr492.talentease.data.network
 
+import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByIdModel
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
 import com.bangkit.c23pr492.talentease.data.model.application.ApplicationUpdateResponse
 import com.bangkit.c23pr492.talentease.data.model.application.ApplyApplicationResponse
@@ -36,9 +37,16 @@ interface ApiService {
         @Path("positionId") id: String
     ): ApplicationByPositionIdModel
 
-    @PATCH("application")
+    @GET("application/{applicationId}")
+    suspend fun getApplicationById(
+        @Header("Authorization") token: String,
+        @Path("applicationId") id: String
+    ): ApplicationByIdModel
+
+    @PATCH("application/{applicationId}")
     suspend fun updateApplication(
         @Header("Authorization") token: String,
+        @Path("applicationId") id: String,
         @Body status: StatusModel
     ): ApplicationUpdateResponse
 
