@@ -4,105 +4,117 @@ import com.google.gson.annotations.SerializedName
 
 data class ApplicationByPositionIdModel(
 
-	@field:SerializedName("createdAt")
-	val createdAt: String? = null,
+	@field:SerializedName("data")
+	val data: List<DataItem>,
 
-	@field:SerializedName("candidate")
-	val candidate: Candidate? = null,
-
-	@field:SerializedName("cv")
-	val cv: String? = null,
-
-	@field:SerializedName("positionId")
-	val positionId: String? = null,
-
-	@field:SerializedName("id")
-	val id: String? = null,
-
-	@field:SerializedName("position")
-	val position: Position? = null,
-
-	@field:SerializedName("candidateId")
-	val candidateId: String? = null,
+	@field:SerializedName("message")
+	val message: String,
 
 	@field:SerializedName("status")
-	val status: String? = null,
-
-	@field:SerializedName("updatedAt")
-	val updatedAt: String? = null
-)
-
-data class Position(
-
-	@field:SerializedName("createdAt")
-	val createdAt: String? = null,
-
-	@field:SerializedName("companyId")
-	val companyId: String? = null,
-
-	@field:SerializedName("description")
-	val description: String? = null,
-
-	@field:SerializedName("company")
-	val company: Company? = null,
-
-	@field:SerializedName("title")
-	val title: String? = null,
-
-	@field:SerializedName("salary")
-	val salary: Int? = null,
-
-	@field:SerializedName("type")
-	val type: String? = null,
-
-	@field:SerializedName("deadline")
-	val deadline: String? = null,
-
-	@field:SerializedName("updatedAt")
-	val updatedAt: String? = null
+	val status: Int
 )
 
 data class Company(
 
 	@field:SerializedName("createdAt")
-	val createdAt: String? = null,
+	val createdAt: String,
 
 	@field:SerializedName("address")
-	val address: String? = null,
+	val address: String,
 
 	@field:SerializedName("name")
-	val name: String? = null,
+	val name: String,
 
 	@field:SerializedName("description")
-	val description: String? = null,
+	val description: String,
 
 	@field:SerializedName("updatedAt")
-	val updatedAt: String? = null
+	val updatedAt: String
+)
+
+data class Position(
+
+	@field:SerializedName("createdAt")
+	val createdAt: String,
+
+	@field:SerializedName("companyId")
+	val companyId: String,
+
+	@field:SerializedName("description")
+	val description: String,
+
+	@field:SerializedName("company")
+	val company: Company,
+
+	@field:SerializedName("title")
+	val title: String,
+
+	@field:SerializedName("type")
+	val type: String,
+
+	@field:SerializedName("deadline")
+	val deadline: String,
+
+	@field:SerializedName("salary")
+	val salary: Int,
+
+	@field:SerializedName("updatedAt")
+	val updatedAt: String
 )
 
 data class Candidate(
 
 	@field:SerializedName("uid")
-	val uid: String? = null,
+	val uid: String,
 
 	@field:SerializedName("firstName")
-	val firstName: String? = null,
+	val firstName: String,
 
 	@field:SerializedName("lastName")
-	val lastName: String? = null,
+	val lastName: String,
 
 	@field:SerializedName("createdAt")
-	val createdAt: String? = null,
+	val createdAt: String,
 
 	@field:SerializedName("phoneNumber")
-	val phoneNumber: String? = null,
+	val phoneNumber: String,
 
 	@field:SerializedName("role")
-	val role: String? = null,
+	val role: String,
 
 	@field:SerializedName("updateAt")
-	val updateAt: String? = null,
+	val updateAt: String,
 
 	@field:SerializedName("email")
-	val email: String? = null
+	val email: String
+)
+
+data class DataItem(
+
+	@field:SerializedName("createdAt")
+	val createdAt: String,
+
+	@field:SerializedName("candidate")
+	val candidate: Candidate,
+
+	@field:SerializedName("cv")
+	val cv: String,
+
+	@field:SerializedName("positionId")
+	val positionId: String,
+
+	@field:SerializedName("id")
+	val id: String,
+
+	@field:SerializedName("position")
+	val position: Position,
+
+	@field:SerializedName("candidateId")
+	val candidateId: String,
+
+	@field:SerializedName("status")
+	val status: String,
+
+	@field:SerializedName("updatedAt")
+	val updatedAt: String
 )

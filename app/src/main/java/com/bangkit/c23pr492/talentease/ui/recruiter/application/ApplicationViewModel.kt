@@ -1,28 +1,31 @@
 package com.bangkit.c23pr492.talentease.ui.recruiter.application
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bangkit.c23pr492.talentease.data.RecruiterRepository
 import com.bangkit.c23pr492.talentease.data.Resource
-import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
-import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.application.DataItem
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ApplicationViewModel(private val repository: RecruiterRepository) : ViewModel() {
-    private val _listPositionState =
-        MutableStateFlow<UiState<List<PositionItemModel>>>(UiState.Initial)
-    val listPositionState = _listPositionState.asStateFlow()
+    private val _listApplicationState =
+        MutableStateFlow<UiState<MutableList<DataItem>>>(UiState.Initial)
+    val listApplicationState = _listApplicationState.asStateFlow()
 
-    private val _applicationState =
-        MutableStateFlow<UiState<ApplicationByPositionIdModel>>(UiState.Initial)
-    val applicationState = _applicationState.asStateFlow()
+    var dataItem by mutableStateOf(mutableListOf<DataItem>())
+        private set
 
-    private val _listApplication = mutableListOf<ApplicationByPositionIdModel>()
-    val listApplication = _listApplication
+    private fun addItem(data: DataItem) {
+        dataItem.add(data)
+    }
 
     private val _query = MutableStateFlow("")
     val query = _query.asStateFlow()
@@ -31,38 +34,44 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAllPositions(token).collect {
                 when (it) {
-                    Resource.Loading -> _listPositionState.emit(UiState.Loading)
+                    Resource.Loading -> _listApplicationState.emit(UiState.Loading)
                     is Resource.Success -> {
-                        if (it.data.isNullOrEmpty()) _listPositionState.emit(UiState.Empty)
-                        else _listPositionState.emit(UiState.Success(it.data))
-                        Log.d("applicant", "getAllPositions: ${it.data}")
+                        Log.d("kenapa", "getAllPositions: sekali dua kali tiga enam")
+                        it.data?.forEach { position ->
+                            repository.getApplicationByPositionId(token, position.id)
+                                .collect { application ->
+                                    when (application) {
+                                        Resource.Loading -> _listApplicationState.emit(UiState.Loading)
+                                        is Resource.Error -> _listApplicationState.emit(
+                                            UiState.Error(
+                                                application.error
+                                            )
+                                        )
+                                        is Resource.Success -> {
+                                            application.data.data.forEach { item ->
+                                                addItem(item)
+                                                Log.d(
+                                                    "kenapa",
+                                                    "getApplicationByPositionId: ${item.id}"
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                        }
+                        _listApplicationState.emit(UiState.Success(dataItem))
                     }
-                    is Resource.Error -> _listPositionState.emit(UiState.Error(it.error))
+                    is Resource.Error -> _listApplicationState.emit(UiState.Error(it.error))
                 }
             }
         }
     }
 
-    fun getApplicationByPositionId(token: String, positionId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getApplicationByPositionId(token, positionId).collect {
-                when(it) {
-                    Resource.Loading -> _applicationState.emit(UiState.Loading)
-                    is Resource.Error -> _applicationState.emit(UiState.Error(it.error))
-                    is Resource.Success -> {
-                        if (it.data.id != null) {
-                            _listApplication.add(it.data)
-                            Log.d("applicant", "getApplicationByPositionId: ${it.data}")
-                            _applicationState.emit(UiState.Success(it.data))
-                        } else {
-                            Log.d("applicant", "getApplicationByPositionId: data ne kosong")
-                            _applicationState.emit(UiState.Empty)
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    private fun getApplicationByPositionId(token: String, positionId: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//
+//        }
+//    }
 
     //    private val _profileState =
 //        MutableStateFlow<UiState<ProfileModel>>(UiState.Initial)

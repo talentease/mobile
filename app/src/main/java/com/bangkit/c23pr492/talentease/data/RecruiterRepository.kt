@@ -20,10 +20,11 @@ class RecruiterRepository(
         emit(Resource.Loading)
         try {
             val response = apiService.getApplicationByPositionId(generateBearerToken(token), positionId)
-            Log.d(Const.tagRepository, response.toString())
+            Log.d("apprepos", positionId)
+            Log.d("apprepos", response.toString())
             emit(Resource.Success(response))
         } catch (e: Exception) {
-            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            Log.e("apprepox", Log.getStackTraceString(e))
             emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
         }
     }

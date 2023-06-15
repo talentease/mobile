@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
+import com.bangkit.c23pr492.talentease.data.model.application.DataItem
 import com.bangkit.c23pr492.talentease.ui.AuthViewModel
 import com.bangkit.c23pr492.talentease.ui.component.EmptyContentScreen
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
@@ -53,18 +53,20 @@ fun ApplicationScreen(
     ),
     navigateToDetail: (String) -> Unit
 ) {
-    val listPositionState = applicationViewModel.listPositionState.collectAsState()
-    val applicationState = applicationViewModel.applicationState.collectAsState()
-    val listApplication = applicationViewModel.listApplication
+    val listApplicationState = applicationViewModel.listApplicationState.collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        applicationViewModel.getAllPositions(token)
+    }
+
     var isLoading by rememberSaveable { mutableStateOf(false) }
     LoadingProgressBar(isLoading = isLoading)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
-//        SearchBarScreen(applicationViewModel)
         val listState = rememberLazyListState()
-        listPositionState.value.let { position ->
+        listApplicationState.value.let { position ->
             when (position) {
                 UiState.Empty -> {
                     isLoading = false
@@ -72,7 +74,6 @@ fun ApplicationScreen(
                 }
                 UiState.Initial -> {
                     isLoading = false
-                    applicationViewModel.getAllPositions(token)
                 }
                 UiState.Loading -> isLoading = true
                 is UiState.Error -> {
@@ -84,15 +85,12 @@ fun ApplicationScreen(
                     ).show()
                 }
                 is UiState.Success -> {
-                    position.data.forEach {
-                        Log.d("applicant", "ApplicationScreen: ${it.id}")
-                        applicationViewModel.getApplicationByPositionId(token, it.id)
-                    }
                     isLoading = false
+                    Log.d("kenapa", "ApplicationScreen: ${position.data}")
                     ApplicationContentScreen(
-                        token,
-                        listState,
-                        listApplication,
+                        token = token,
+                        listState = listState,
+                        data = position.data,
                         navigateToDetail = navigateToDetail
                     )
                 }
@@ -148,10 +146,11 @@ fun SearchBarScreen(applicationViewModel: ApplicationViewModel) {
 fun ApplicationContentScreen(
     token: String,
     listState: LazyListState = rememberLazyListState(),
-    data: List<ApplicationByPositionIdModel>,
+    data: MutableList<DataItem>,
     modifier: Modifier = Modifier,
     navigateToDetail: (String) -> Unit
 ) {
+    Log.d("apprepo", "ApplicationContentScreen: final $data")
     Box(modifier = modifier) {
         val scope = rememberCoroutineScope()
         val showButton: Boolean by remember {
@@ -162,7 +161,7 @@ fun ApplicationContentScreen(
             contentPadding = PaddingValues(bottom = 80.dp),
             modifier = modifier.testTag(tagTestList)
         ) {
-            items(data, key = { it.id.toString() }) { application ->
+            items(data, key = { it.id }) { application ->
                 ApplicationItems(
                     token,
                     application,
@@ -196,7 +195,7 @@ fun ApplicationContentScreen(
 @Composable
 fun ApplicationItems(
     token: String,
-    application: ApplicationByPositionIdModel,
+    application: DataItem,
     modifier: Modifier = Modifier,
     navigateToDetail: (String) -> Unit,
 ) {
@@ -204,8 +203,8 @@ fun ApplicationItems(
         Column(modifier = modifier.clickable {
             navigateToDetail(token)
         }) {
-            TitleText(string = candidate?.firstName + candidate?.lastName)
-            StatusAndPositionText(status = status.toString(), position = position?.title.toString())
+            TitleText(string = candidate.firstName + candidate.lastName)
+            StatusAndPositionText(status = status, position = position.title)
         }
     }
 }
