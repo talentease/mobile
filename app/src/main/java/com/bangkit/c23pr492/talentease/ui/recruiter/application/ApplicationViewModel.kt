@@ -36,7 +36,6 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
                 when (it) {
                     Resource.Loading -> _listApplicationState.emit(UiState.Loading)
                     is Resource.Success -> {
-                        Log.d("kenapa", "getAllPositions: sekali dua kali tiga enam")
                         it.data?.forEach { position ->
                             repository.getApplicationByPositionId(token, position.id)
                                 .collect { application ->
@@ -64,6 +63,17 @@ class ApplicationViewModel(private val repository: RecruiterRepository) : ViewMo
                     is Resource.Error -> _listApplicationState.emit(UiState.Error(it.error))
                 }
             }
+        }
+    }
+
+    fun searchApplications(newQuery: String) {
+        _query.value = newQuery
+        viewModelScope.launch(Dispatchers.IO) {
+            val filterItem = dataItem.filter {
+                val fullName = it.candidate.firstName + it.candidate.lastName
+                fullName.contains(newQuery, ignoreCase = true)
+            }
+            _listApplicationState.emit(UiState.Success(filterItem.toMutableList()))
         }
     }
 
