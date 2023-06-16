@@ -3,6 +3,7 @@ package com.bangkit.c23pr492.talentease.data
 import android.util.Log
 import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.data.datastore.AuthDataStore
+import com.bangkit.c23pr492.talentease.data.model.RegisterModel
 import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const.tagRepository
 import com.bangkit.c23pr492.talentease.utils.UiText
@@ -62,11 +63,12 @@ class AuthRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun registerUser(email: String, password: String): Flow<Resource<FirebaseUser?>> = flow {
+    fun registerUser(email: String, password: String) = flow {
         emit(Resource.Loading)
         try {
-            val response = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            emit(Resource.Success(response.user))
+            val response = apiService.register(RegisterModel(email = email, password = password))
+            Log.d("register", "registerUser: 123")
+            emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(tagRepository, Log.getStackTraceString(e))
             if (e.message.isNullOrBlank()) {

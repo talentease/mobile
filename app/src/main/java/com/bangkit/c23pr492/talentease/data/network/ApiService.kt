@@ -1,5 +1,7 @@
 package com.bangkit.c23pr492.talentease.data.network
 
+import com.bangkit.c23pr492.talentease.data.model.RegisterModel
+import com.bangkit.c23pr492.talentease.data.model.RegisterResponse
 import com.bangkit.c23pr492.talentease.data.model.application.*
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionResponse
@@ -101,4 +103,9 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("uid") id: String
     ): AllApplicationByUserIdResponse
+
+    @POST("auth/register")
+    suspend fun register(
+        @Body register: RegisterModel
+    ): RegisterResponse
 }
