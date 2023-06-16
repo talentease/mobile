@@ -201,10 +201,9 @@ fun DetailApplicationContentScreen(
                             )
                             HyperlinkText(
                                 fullText = "Click here to open CV",
-                                linkText = listOf("Click here to open CV"),
+                                linkText = listOf("Click here to download CV"),
                                 hyperlinks = listOf(cv),
                                 linkTextColor = MaterialTheme.colorScheme.primary,
-
                                 )
                         }
                     }
