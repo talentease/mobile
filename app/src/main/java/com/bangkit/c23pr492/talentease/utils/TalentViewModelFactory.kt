@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bangkit.c23pr492.talentease.data.TalentRepository
 import com.bangkit.c23pr492.talentease.di.Injection
 import com.bangkit.c23pr492.talentease.ui.talent.application.TalentApplicationViewModel
+import com.bangkit.c23pr492.talentease.ui.talent.profile.ProfileViewModel
 import com.bangkit.c23pr492.talentease.ui.talent.vacancy.VacancyViewModel
 import com.bangkit.c23pr492.talentease.ui.talent.vacancy.detail.DetailVacancyViewModel
 
@@ -21,6 +22,9 @@ class TalentViewModelFactory private constructor(private val repository: TalentR
                 repository
             ) as T
             modelClass.isAssignableFrom(TalentApplicationViewModel::class.java) -> return TalentApplicationViewModel(
+                repository
+            ) as T
+            modelClass.isAssignableFrom(ProfileViewModel::class.java) -> return ProfileViewModel(
                 repository
             ) as T
         }

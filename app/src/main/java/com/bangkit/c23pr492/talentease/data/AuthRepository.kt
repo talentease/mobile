@@ -29,15 +29,15 @@ class AuthRepository(
         authDataStore.clearToken()
     }
 
-//    fun getUserId(): Flow<String?> = authDataStore.getUserId()
-//
-//    suspend fun saveUserId(uid: String) {
-//        authDataStore.saveUserId(uid)
-//    }
-//
-//    private suspend fun clearUserId() {
-//        authDataStore.clearUserId()
-//    }
+    fun getUserId(): Flow<String?> = authDataStore.getUserId()
+
+    suspend fun saveUserId(uid: String) {
+        authDataStore.saveUserId(uid)
+    }
+
+    private suspend fun clearUserId() {
+        authDataStore.clearUserId()
+    }
 
     fun getRole(): Flow<String?> = authDataStore.getRole()
 

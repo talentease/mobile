@@ -116,7 +116,7 @@ fun SearchBarScreen(token: String, positionViewModel: PositionViewModel) {
             active = it
         },
         placeholder = {
-            Text(text = "Search talent's name")
+            Text(text = "Search position's name")
         },
         leadingIcon = {
             Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")

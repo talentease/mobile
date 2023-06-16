@@ -93,6 +93,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                     if (it.data != null) {
                         val token = it.data.getIdToken(true).await().token.toString()
                         repository.saveToken(token)
+                        repository.saveUserId(it.data.uid)
                         Log.d("login", "loginUser: masuk login $token")
                         checkRole(token, it.data.uid)
                         _tokenState.emit(UiState.Success(token))

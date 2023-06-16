@@ -1,11 +1,13 @@
 package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
+import com.bangkit.c23pr492.talentease.R
 import com.bangkit.c23pr492.talentease.data.database.ApplicationEntity
 import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
 import com.bangkit.c23pr492.talentease.data.database.TalentEntity
 import com.bangkit.c23pr492.talentease.data.datastore.AuthDataStore
 import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
+import com.bangkit.c23pr492.talentease.data.model.profile.CreateProfileModel
 import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const.tagRepository
 import com.bangkit.c23pr492.talentease.utils.UiText
@@ -108,45 +110,45 @@ class TalentRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-//    suspend fun applyPosition(token: String, positionId: String, file: MultipartBody.Part) {
-//        val client = apiService.applyPositions(
-//            generateBearerToken(token),
-//            positionId.toRequestBody("text/plain".toMediaType()),
-//            file
-//        )
-//        with(client) {
-//            enqueue(object : Callback<ApplyApplicationResponse> {
-//                override fun onResponse(
-//                    call: Call<ApplyApplicationResponse>,
-//                    response: Response<ApplyApplicationResponse>
-//                ) {
-//                    if (response.isSuccessful) {
-//                        response.body()?.data
-//                        Log.e("upload", "onSuccess: ${response.body()?.data}")
-//                    } else {
-//                        Log.e("upload", "onFailure: ${response.message()}")
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<ApplyApplicationResponse>, t: Throwable) {
-//                    Log.e("upload", "onFailure: ${t.message.toString()}")
-//                }
-//            })
-//        }
-//    }
+    fun createProfile(token: String, profile: CreateProfileModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.createCandidateProfile(generateBearerToken(token), profile)
+            Log.d(tagRepository, response.toString())
+            emit(Resource.Success(response.data))
+        } catch (e: Exception) {
+            Log.e(tagRepository, "upload " + Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
 
-    //    fun getPositionWithPositionId(positionId: String) = flow {
-//        emit(Resource.Loading)
-//        try {
-//            val response = mTalentEaseDao.getPositionWithPositionId(positionId)
-//            Log.d(tagRepository, response.toString())
-//            emit(Resource.Success(response))
-//        } catch (e: Exception) {
-//            Log.e(tagRepository, Log.getStackTraceString(e))
-//            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
-//        }
-//    }.flowOn(Dispatchers.IO)
-//
+    fun updateProfile(token: String, profile: CreateProfileModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.updateProfile(generateBearerToken(token), profile)
+            Log.d(tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, "upload " + Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }
+
+    fun getProfileById(token: String, uid: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getProfileById(token, uid)
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            if (e.message.isNullOrBlank()) {
+                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
+            } else {
+                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
     fun getAllTalentApplicationWithTalentId(talentId: String) = flow {
         emit(Resource.Loading)
         try {

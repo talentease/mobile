@@ -7,6 +7,7 @@ import com.bangkit.c23pr492.talentease.data.model.application.ApplyApplicationRe
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionResponse
 import com.bangkit.c23pr492.talentease.data.model.position.*
+import com.bangkit.c23pr492.talentease.data.model.profile.CreateProfileModel
 import com.bangkit.c23pr492.talentease.data.model.profile.ProfileModel
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -30,6 +31,12 @@ interface ApiService {
     suspend fun getProfileById(
         @Header("Authorization") token: String,
         @Path("uid") id: String
+    ): ProfileModel
+
+    @PATCH("profile")
+    suspend fun updateProfile(
+        @Header("Authorization") token: String,
+        @Body profile: CreateProfileModel
     ): ProfileModel
 
     // Recruiter
@@ -79,4 +86,10 @@ interface ApiService {
         @Part("positionId") positionId: RequestBody,
         @Part cv: MultipartBody.Part,
     ): ApplyApplicationResponse
+
+    @POST("application/candidate")
+    suspend fun createCandidateProfile(
+        @Header("Authorization") token: String,
+        @Body profile: CreateProfileModel
+    ): ProfileModel
 }

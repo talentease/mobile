@@ -102,6 +102,7 @@ fun DetailVacancyContentScreen(
             val myFile = uriToFile(selectedFile, context)
             val requestPdfFile = myFile.asRequestBody("application/pdf".toMediaTypeOrNull())
             Log.d("upload", "DetailVacancyContentScreen: req $requestPdfFile")
+            Log.d("upload", "DetailVacancyContentScreen: req ${myFile.name}")
             cvMultipart = MultipartBody.Part.createFormData(
                 "cv",
                 myFile.name,

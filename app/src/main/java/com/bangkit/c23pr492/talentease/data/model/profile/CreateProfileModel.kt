@@ -12,7 +12,4 @@ data class CreateProfileModel(
 
 	@field:SerializedName("phoneNumber")
 	val phoneNumber: String,
-
-	@field:SerializedName("location")
-	val location: String
 )
