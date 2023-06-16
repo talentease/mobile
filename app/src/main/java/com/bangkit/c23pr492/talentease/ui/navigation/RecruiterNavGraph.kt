@@ -95,7 +95,14 @@ fun NavGraphBuilder.recruiterNavGraph(
             Log.d("position", "recruiterNavGraph: $positionId")
             DetailPositionScreen(
                 token = token,
-                positionId = positionId
+                positionId = positionId,
+                navigateToPosition = { route ->
+                    navController.navigate(route) {
+                        popUpTo(recruiterGraphRoute) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
         composable(

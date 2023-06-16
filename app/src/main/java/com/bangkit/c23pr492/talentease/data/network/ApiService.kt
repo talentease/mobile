@@ -78,6 +78,12 @@ interface ApiService {
         @Body position: PositionModel
     ): PositionResponse
 
+    @DELETE("position/{positionId}")
+    suspend fun deletePosition(
+        @Header("Authorization") token: String,
+        @Path("positionId") id: String
+    ): DeletePositionResponse
+
     // Talent
     @Multipart
     @POST("application/create")

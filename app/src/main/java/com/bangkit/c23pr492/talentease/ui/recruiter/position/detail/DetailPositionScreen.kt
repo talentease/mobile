@@ -1,12 +1,12 @@
 package com.bangkit.c23pr492.talentease.ui.recruiter.position.detail
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.ui.component.LoadingProgressBar
+import com.bangkit.c23pr492.talentease.ui.core.UiEvents
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.RecruiterViewModelFactory
 import com.bangkit.c23pr492.talentease.utils.UiText.Companion.asString
@@ -26,6 +27,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -34,40 +36,67 @@ import java.time.format.DateTimeFormatter
 fun DetailPositionScreen(
     token: String,
     positionId: String,
-    context: Context = LocalContext.current,
     modifier: Modifier = Modifier,
     detailPositionViewModel: DetailPositionViewModel = viewModel(
         factory = RecruiterViewModelFactory.getInstance()
     ),
+    navigateToPosition: (String) -> Unit
 ) {
     Log.d("position", "DetailPositionScreen: $positionId")
     val detailPositionState = detailPositionViewModel.detailPositionState.collectAsState()
-    var isLoading by rememberSaveable { mutableStateOf(false) }
-    LoadingProgressBar(isLoading = isLoading)
-    detailPositionState.value.let { state ->
-        when (state) {
-            UiState.Empty -> {}
-            UiState.Initial -> {
-                isLoading = false
-                detailPositionViewModel.getDetailPosition(token, positionId)
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    detailPositionViewModel.deletePosition(token, positionId)
+                }
+            ) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Position")
             }
-            UiState.Loading -> isLoading = true
-            is UiState.Error -> {
-                isLoading = false
-                Toast.makeText(
-                    LocalContext.current,
-                    state.error.asString(LocalContext.current),
-                    Toast.LENGTH_SHORT
-                ).show()
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
+        var isLoading by rememberSaveable { mutableStateOf(false) }
+        LoadingProgressBar(isLoading = isLoading)
+        LaunchedEffect(key1 = true) {
+            detailPositionViewModel.eventFlow.collectLatest {
+                when(it) {
+                    UiEvents.Loading -> isLoading = true
+                    is UiEvents.NavigateEvent -> {
+                        isLoading = false
+                        navigateToPosition(it.route)
+                    }
+                    is UiEvents.SnackBarEvent -> {
+                        isLoading = false
+                    }
+                }
             }
-            is UiState.Success -> {
-                isLoading = false
-                DetailPositionContentScreen(
-                    token,
-                    positionId,
-                    position = state.data,
-                    detailPositionViewModel = detailPositionViewModel
-                )
+        }
+        detailPositionState.value.let { state ->
+            when (state) {
+                UiState.Empty -> {}
+                UiState.Initial -> {
+                    isLoading = false
+                    detailPositionViewModel.getDetailPosition(token, positionId)
+                }
+                UiState.Loading -> isLoading = true
+                is UiState.Error -> {
+                    isLoading = false
+                    Toast.makeText(
+                        LocalContext.current,
+                        state.error.asString(LocalContext.current),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is UiState.Success -> {
+                    isLoading = false
+                    DetailPositionContentScreen(
+                        token,
+                        positionId,
+                        position = state.data,
+                        detailPositionViewModel = detailPositionViewModel
+                    )
+                }
             }
         }
     }

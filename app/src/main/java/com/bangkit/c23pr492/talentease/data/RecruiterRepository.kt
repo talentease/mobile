@@ -134,6 +134,18 @@ class RecruiterRepository(
         }
     }.flowOn(Dispatchers.IO)
 
+    fun deletePosition(token: String, positionId: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.deletePosition(generateBearerToken(token), positionId)
+            Log.d(Const.tagRepository, "delete: $response")
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, "update: ${Log.getStackTraceString(e)}")
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }
+
     private fun generateBearerToken(token: String): String {
         return if (token.contains("bearer", true)) {
             token
