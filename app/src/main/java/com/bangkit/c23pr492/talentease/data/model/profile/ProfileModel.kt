@@ -20,16 +20,16 @@ data class Data(
 	val uid: String,
 
 	@field:SerializedName("firstName")
-	val firstName: String,
+	val firstName: String?,
 
 	@field:SerializedName("lastName")
-	val lastName: String,
+	val lastName: String?,
 
 	@field:SerializedName("createdAt")
 	val createdAt: String,
 
 	@field:SerializedName("phoneNumber")
-	val phoneNumber: String,
+	val phoneNumber: String?,
 
 	@field:SerializedName("role")
 	val role: String,
@@ -38,5 +38,5 @@ data class Data(
 	val updateAt: String,
 
 	@field:SerializedName("email")
-	val email: String
+	val email: String?
 )

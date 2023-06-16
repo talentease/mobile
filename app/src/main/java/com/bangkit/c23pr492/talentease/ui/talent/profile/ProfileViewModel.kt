@@ -74,10 +74,10 @@ class ProfileViewModel(private val repository: TalentRepository) : ViewModel() {
                         }
                         is Resource.Success -> {
                             resource.data.data.let {
-                                firstName = it.firstName
-                                lastName = it.lastName
-                                phone = it.phoneNumber
-                                email = it.email
+                                firstName = it.firstName ?: ""
+                                lastName = it.lastName ?: ""
+                                phone = it.phoneNumber ?: ""
+                                email = it.email ?: ""
                             }
                             _profileState.emit(UiState.Success(resource.data))
                         }
@@ -97,10 +97,10 @@ class ProfileViewModel(private val repository: TalentRepository) : ViewModel() {
                     }
                     is Resource.Success -> {
                         resource.data.data.let {
-                            firstName = it.firstName
-                            lastName = it.lastName
-                            phone = it.phoneNumber
-                            email = it.email
+                            firstName = it.firstName ?: ""
+                            lastName = it.lastName ?: ""
+                            phone = it.phoneNumber ?: ""
+                            email = it.email ?: ""
                         }
                         _profileState.emit(UiState.Success(resource.data))
                     }
