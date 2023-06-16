@@ -12,8 +12,6 @@ class AuthViewModelFactory private constructor(private val repository: AuthRepos
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         when {
             modelClass.isAssignableFrom(AuthViewModel::class.java) -> return AuthViewModel(repository) as T
-//            modelClass.isAssignableFrom(LoginViewModel::class.java) -> return LoginViewModel(repository) as T
-//            modelClass.isAssignableFrom(RegisterViewModel::class.java) -> return RegisterViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel Class: " + modelClass.name)
     }

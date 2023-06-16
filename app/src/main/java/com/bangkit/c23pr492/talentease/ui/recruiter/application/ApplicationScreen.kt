@@ -48,7 +48,7 @@ fun ApplicationScreen(
         factory = AuthViewModelFactory.getInstance(context)
     ),
     applicationViewModel: ApplicationViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance()
+        factory = RecruiterViewModelFactory.getInstance(context)
     ),
     navigateToDetail: (String, String) -> Unit
 ) {

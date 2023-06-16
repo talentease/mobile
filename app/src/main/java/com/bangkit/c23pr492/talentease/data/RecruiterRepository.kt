@@ -1,10 +1,13 @@
 package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
+import com.bangkit.c23pr492.talentease.R
+import com.bangkit.c23pr492.talentease.data.datastore.AuthDataStore
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
 import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.data.model.position.PositionModel
 import com.bangkit.c23pr492.talentease.data.model.position.StatusModel
+import com.bangkit.c23pr492.talentease.data.model.profile.CreateProfileModel
 import com.bangkit.c23pr492.talentease.data.network.ApiService
 import com.bangkit.c23pr492.talentease.utils.Const
 import com.bangkit.c23pr492.talentease.utils.UiText
@@ -15,8 +18,11 @@ import kotlinx.coroutines.flow.flowOn
 
 class RecruiterRepository(
     private val apiService: ApiService,
-    private val mlService: ApiService
+    private val mlService: ApiService,
+    private val authDataStore: AuthDataStore
 ) {
+    fun getRecruiterId(): Flow<String?> = authDataStore.getUserId()
+
     fun getApplicationByPositionId(token: String, positionId: String) = flow {
         emit(Resource.Loading)
         try {
@@ -146,6 +152,45 @@ class RecruiterRepository(
         }
     }
 
+    fun createProfile(token: String, profile: CreateProfileModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.createCandidateProfile(generateBearerToken(token), profile)
+            Log.d(Const.tagRepository, response.toString())
+            emit(Resource.Success(response.data))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, "upload " + Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    fun updateProfile(token: String, profile: CreateProfileModel) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.updateProfile(generateBearerToken(token), profile)
+            Log.d(Const.tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, "upload " + Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }
+
+    fun getProfileById(token: String, uid: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getProfileById(token, uid)
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(Const.tagRepository, Log.getStackTraceString(e))
+            if (e.message.isNullOrBlank()) {
+                emit(Resource.Error(UiText.StringResource(R.string.unknown_error)))
+            } else {
+                emit(Resource.Error(UiText.DynamicString(e.message.toString())))
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
     private fun generateBearerToken(token: String): String {
         return if (token.contains("bearer", true)) {
             token
@@ -159,9 +204,10 @@ class RecruiterRepository(
         private var instance: RecruiterRepository? = null
         fun getInstance(
             apiService: ApiService,
-            mlService: ApiService
+            mlService: ApiService,
+            authDataStore: AuthDataStore
         ): RecruiterRepository = instance ?: synchronized(this) {
-            instance ?: RecruiterRepository(apiService, mlService)
+            instance ?: RecruiterRepository(apiService, mlService, authDataStore)
         }.also { instance = it }
     }
 }

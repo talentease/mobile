@@ -43,7 +43,7 @@ fun DetailRecruiterApplicationScreen(
     applicationId: String,
     context: Context = LocalContext.current,
     detailApplicationViewModel: DetailApplicationViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance()
+        factory = RecruiterViewModelFactory.getInstance(context)
     ),
 ) {
     val emailAddress = "a200dkx4783@bangkit.academy"
@@ -273,7 +273,7 @@ fun DetailApplicationContentScreen(
                     }
                 }
                 //Status
-                val statusList: List<String> = listOf("Pending", "Screening", "Interview", "Accept", "Reject", "Active", "Expired",)
+                val statusList: List<String> = listOf("Pending", "Screening", "Interview", "Accept", "Reject", "Active", "Expired")
                 var selected by rememberSaveable { mutableStateOf(status) }
                 LazyRow(state = listState, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(statusList, key = { it }) { status ->

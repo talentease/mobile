@@ -22,10 +22,11 @@ object Injection {
             )
     }
 
-    fun provideRecruiterRepository(): RecruiterRepository {
+    fun provideRecruiterRepository(context: Context): RecruiterRepository {
         return RecruiterRepository.getInstance(
             ApiConfig.getApiService(),
-            ApiConfig.getMLApiService()
+            ApiConfig.getMLApiService(),
+            AuthDataStore.getInstance(context.dataStore)
         )
     }
 

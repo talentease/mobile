@@ -29,8 +29,6 @@ class AuthRepository(
         authDataStore.clearToken()
     }
 
-    fun getUserId(): Flow<String?> = authDataStore.getUserId()
-
     suspend fun saveUserId(uid: String) {
         authDataStore.saveUserId(uid)
     }
@@ -84,6 +82,7 @@ class AuthRepository(
         try {
             val response = firebaseAuth.signOut().also {
                 clearToken()
+                clearUserId()
                 clearRole()
             }
             emit(Resource.Success(response))

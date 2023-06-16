@@ -38,7 +38,7 @@ fun DetailPositionScreen(
     positionId: String,
     modifier: Modifier = Modifier,
     detailPositionViewModel: DetailPositionViewModel = viewModel(
-        factory = RecruiterViewModelFactory.getInstance()
+        factory = RecruiterViewModelFactory.getInstance(LocalContext.current)
     ),
     navigateToPosition: (String) -> Unit
 ) {
