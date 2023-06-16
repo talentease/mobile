@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -12,7 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,7 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.database.ApplicationWithTalentAndPositionAndCompany
+import com.bangkit.c23pr492.talentease.data.model.application.DataItem
 import com.bangkit.c23pr492.talentease.ui.component.*
 import com.bangkit.c23pr492.talentease.ui.core.UiState
 import com.bangkit.c23pr492.talentease.utils.Const
@@ -43,54 +46,91 @@ fun TalentApplicationScreen(
     )
 ) {
     var isLoading by rememberSaveable { mutableStateOf(false) }
-    val talentIdState = talentApplicationViewModel.talentIdState.collectAsState()
     val listDataState = talentApplicationViewModel.listALlApplicationState.collectAsState()
-    LoadingProgressBar(isLoading = isLoading, modifier = modifier)
+    LoadingProgressBar(isLoading = isLoading)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxSize()
     ) {
+        SearchBarScreen(
+            token,
+            talentApplicationViewModel
+        )
+        Spacer(modifier = Modifier.padding(bottom = 8.dp))
         val listState = rememberLazyListState()
-        talentIdState.value.let {
-            when (it) {
+        listDataState.value.let { state ->
+            when (state) {
                 UiState.Initial -> {
-                    talentApplicationViewModel.getTalentId()
+                    isLoading = false
+                    talentApplicationViewModel.getAllTalentApplication(token)
+                }
+                is UiState.Loading -> isLoading = true
+                is UiState.Empty -> {
+                    isLoading = false
+                    EmptyContentScreen(R.string.empty_list, modifier)
                 }
                 is UiState.Success -> {
-                    listDataState.value.let { state ->
-                        when (state) {
-                            UiState.Initial -> {
-                                isLoading = false
-                                talentApplicationViewModel.getAllTalentApplication(it.data)
-                            }
-                            is UiState.Loading -> isLoading = true
-                            is UiState.Empty -> {
-                                isLoading = false
-                                EmptyContentScreen(R.string.empty_list, modifier)
-                            }
-                            is UiState.Success -> {
-                                isLoading = false
-                                TalentApplicationContentScreen(
-                                    token,
-                                    listState,
-                                    state.data,
+                    isLoading = false
+                    TalentApplicationContentScreen(
+                        token,
+                        listState,
+                        state.data,
 //                        navigateToDetail = navigateToDetail
-                                )
-                            }
-                            is UiState.Error -> {
-                                isLoading = false
-                                Toast.makeText(
-                                    LocalContext.current,
-                                    state.error.asString(LocalContext.current),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    }
+                    )
                 }
-                else -> {}
+                is UiState.Error -> {
+                    isLoading = false
+                    Toast.makeText(
+                        LocalContext.current,
+                        state.error.asString(LocalContext.current),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBarScreen(token: String, talentApplicationViewModel: TalentApplicationViewModel) {
+    val query by talentApplicationViewModel.query.collectAsState()
+    var active by rememberSaveable { mutableStateOf(false) }
+    SearchBar(
+        query = query,
+        onQueryChange = {
+            talentApplicationViewModel.searchPositions(token, it)
+        },
+        onSearch = {
+            active = false
+        },
+        active = active,
+        onActiveChange = {
+            active = it
+        },
+        placeholder = {
+            Text(text = "Search your dream job")
+        },
+        leadingIcon = {
+            Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
+        },
+        trailingIcon = {
+            if (active) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Search Icon",
+                    modifier = Modifier.clickable {
+                        if (query.isNotEmpty()) {
+                            talentApplicationViewModel.searchPositions(token, "")
+                        } else {
+                            active = false
+                        }
+                    }
+                )
+            }
+        }
+    ) {
+
     }
 }
 
@@ -99,7 +139,7 @@ fun TalentApplicationScreen(
 fun TalentApplicationContentScreen(
     token: String,
     listState: LazyListState = rememberLazyListState(),
-    data: List<ApplicationWithTalentAndPositionAndCompany>,
+    data: List<DataItem>,
     modifier: Modifier = Modifier,
 //    navigateToDetail: (String, String) -> Unit
 ) {
@@ -113,13 +153,13 @@ fun TalentApplicationContentScreen(
             contentPadding = PaddingValues(bottom = 80.dp),
             modifier = modifier.testTag(Const.tagTestList)
         ) {
-            items(data, key = { it.application.applicationId }) { application ->
+            items(data, key = { it.id }) { application ->
                 TalentApplicationItems(
                     token,
                     application,
                     modifier = modifier
-                        .padding(all = 16.dp)
                         .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .animateItemPlacement(tween(durationMillis = 100)),
 //                    navigateToDetail = navigateToDetail
                 )
@@ -167,11 +207,10 @@ fun ScrollToTopButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TalentApplicationItems(
     token: String,
-    application: ApplicationWithTalentAndPositionAndCompany,
+    application: DataItem,
     modifier: Modifier = Modifier,
 //    navigateToDetail: (String, String) -> Unit
 ) {
@@ -181,19 +220,22 @@ fun TalentApplicationItems(
 //            navigateToDetail(token, vacancy.position.positionId)
 //        }
     ) {
-        Column(modifier = Modifier.padding(all = 8.dp)) {
-            TitleText(
-                string = application.position.positionName,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-            DescriptionText(
-                string = application.company.companyName,
-                modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
-            )
-            RegularText(
-                string = application.application.status,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+        application.apply {
+            Column(modifier = Modifier.padding(all = 16.dp)) {
+                TitleText(
+                    string = "${candidate.firstName} ${candidate.lastName}",
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                DescriptionText(
+                    string = application.position.company.name,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+                StatusAndPositionText(
+                    status = application.status,
+                    position = application.position.title,
+                    modifier = Modifier.padding()
+                )
+            }
         }
     }
 }

@@ -1,9 +1,6 @@
 package com.bangkit.c23pr492.talentease.data.network
 
-import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByIdModel
-import com.bangkit.c23pr492.talentease.data.model.application.ApplicationByPositionIdModel
-import com.bangkit.c23pr492.talentease.data.model.application.ApplicationUpdateResponse
-import com.bangkit.c23pr492.talentease.data.model.application.ApplyApplicationResponse
+import com.bangkit.c23pr492.talentease.data.model.application.*
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionModel
 import com.bangkit.c23pr492.talentease.data.model.cv.PredictionResponse
 import com.bangkit.c23pr492.talentease.data.model.position.*
@@ -98,4 +95,10 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body profile: CreateProfileModel
     ): ProfileModel
+
+    @GET("application/user/{uid}")
+    suspend fun getAllApplicationsByUserId(
+        @Header("Authorization") token: String,
+        @Path("uid") id: String
+    ): AllApplicationByUserIdResponse
 }

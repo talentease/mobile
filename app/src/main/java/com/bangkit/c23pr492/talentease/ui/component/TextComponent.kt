@@ -51,15 +51,13 @@ fun RegularText(modifier: Modifier = Modifier, string: String) {
 
 @Composable
 fun StatusAndPositionText(modifier: Modifier = Modifier, status: String, position: String) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier.fillMaxWidth()) {
         Text(
             text = status,
             fontWeight = FontWeight.Medium,
             fontSize = textRegular,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = modifier
-                .fillMaxWidth()
         )
         Text(
             text = "/ $position",
@@ -67,8 +65,6 @@ fun StatusAndPositionText(modifier: Modifier = Modifier, status: String, positio
             fontSize = textRegular,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = modifier
-                .fillMaxWidth()
         )
     }
 }

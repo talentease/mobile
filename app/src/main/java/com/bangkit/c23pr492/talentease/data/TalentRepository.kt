@@ -2,9 +2,6 @@ package com.bangkit.c23pr492.talentease.data
 
 import android.util.Log
 import com.bangkit.c23pr492.talentease.R
-import com.bangkit.c23pr492.talentease.data.database.ApplicationEntity
-import com.bangkit.c23pr492.talentease.data.database.TalentEaseDao
-import com.bangkit.c23pr492.talentease.data.database.TalentEntity
 import com.bangkit.c23pr492.talentease.data.datastore.AuthDataStore
 import com.bangkit.c23pr492.talentease.data.model.position.PositionItemModel
 import com.bangkit.c23pr492.talentease.data.model.profile.CreateProfileModel
@@ -21,30 +18,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 class TalentRepository(
     private val apiService: ApiService,
-    private val mTalentEaseDao: TalentEaseDao,
     private val authDataStore: AuthDataStore
 ) {
-    suspend fun addTalent(talent: TalentEntity) {
-        mTalentEaseDao.upsertTalent(talent)
-    }
-
-    suspend fun removeTalent(talent: TalentEntity) {
-        mTalentEaseDao.upsertTalent(talent)
-    }
-
-    suspend fun applyApplication() {
-        mTalentEaseDao.upsertApplication(ApplicationEntity.application1)
-    }
-
     fun getTalentId(): Flow<String?> = authDataStore.getUserId()
-
-    suspend fun saveTalentId(talentId: String) {
-        authDataStore.getUserId()
-    }
-
-    private suspend fun clearTalentId() {
-        authDataStore.getUserId()
-    }
 
     fun getAllPosition(token: String) = flow {
         emit(Resource.Loading)
@@ -110,6 +86,18 @@ class TalentRepository(
         }
     }.flowOn(Dispatchers.IO)
 
+    fun getAllTalentApplicationWithTalentId(token: String, talentId: String) = flow {
+        emit(Resource.Loading)
+        try {
+            val response = apiService.getAllApplicationsByUserId(generateBearerToken(token), talentId)
+            Log.d(tagRepository, response.toString())
+            emit(Resource.Success(response))
+        } catch (e: Exception) {
+            Log.e(tagRepository, Log.getStackTraceString(e))
+            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
+        }
+    }.flowOn(Dispatchers.IO)
+
     fun createProfile(token: String, profile: CreateProfileModel) = flow {
         emit(Resource.Loading)
         try {
@@ -149,18 +137,6 @@ class TalentRepository(
         }
     }.flowOn(Dispatchers.IO)
 
-    fun getAllTalentApplicationWithTalentId(talentId: String) = flow {
-        emit(Resource.Loading)
-        try {
-            val response = mTalentEaseDao.getAllTalentApplicationWithTalentId(talentId)
-            Log.d(tagRepository, response.toString())
-            emit(Resource.Success(response))
-        } catch (e: Exception) {
-            Log.e(tagRepository, Log.getStackTraceString(e))
-            emit(Resource.Error(UiText.DynamicString(e.message ?: "Unknown Error")))
-        }
-    }.flowOn(Dispatchers.IO)
-
     private fun generateBearerToken(token: String): String {
         return if (token.contains("bearer", true)) {
             token
@@ -174,10 +150,9 @@ class TalentRepository(
         private var instance: TalentRepository? = null
         fun getInstance(
             apiService: ApiService,
-            mTalentEaseDao: TalentEaseDao,
             authDataStore: AuthDataStore
         ): TalentRepository = instance ?: synchronized(this) {
-            instance ?: TalentRepository(apiService, mTalentEaseDao, authDataStore)
+            instance ?: TalentRepository(apiService, authDataStore)
         }.also { instance = it }
     }
 }

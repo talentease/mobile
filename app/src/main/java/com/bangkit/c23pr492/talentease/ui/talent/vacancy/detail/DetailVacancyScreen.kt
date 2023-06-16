@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -126,7 +127,7 @@ fun DetailVacancyContentScreen(
         Card {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp).fillMaxWidth()
             ) {
                 Text(text = position.title ?: "")
                 Text(text = position.company?.name ?: "")
@@ -136,7 +137,7 @@ fun DetailVacancyContentScreen(
         Card {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp).fillMaxWidth()
             ) {
                 Text(text = position.type ?: "")
                 Text(text = position.description ?: "")
@@ -149,14 +150,16 @@ fun DetailVacancyContentScreen(
                 intent.type = "application/pdf"
                 val chooser = Intent.createChooser(intent, "Choose a Pdf")
                 pickFileLauncher.launch(chooser)
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Select CV")
         }
         Button(
             onClick = {
                 cvMultipart?.let { detailVacancyViewModel.applyPosition(token, position.id, it) }
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Apply Now")
         }
