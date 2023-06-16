@@ -49,10 +49,10 @@ interface ApiService {
         @Path("applicationId") id: String
     ): ApplicationByIdModel
 
-    @PATCH("application/{applicationId}")
+    @PATCH("application/{userId}")
     suspend fun updateApplication(
         @Header("Authorization") token: String,
-        @Path("applicationId") id: String,
+        @Path("userId") id: String,
         @Body status: StatusModel
     ): ApplicationUpdateResponse
 

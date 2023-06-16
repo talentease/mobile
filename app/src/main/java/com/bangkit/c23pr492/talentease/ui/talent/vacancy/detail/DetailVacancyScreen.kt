@@ -113,6 +113,7 @@ fun DetailVacancyContentScreen(
         }
     }
     LaunchedEffect(key1 = true) {
+        detailVacancyViewModel.prepareEvent(token)
         detailVacancyViewModel.eventFlow.collectLatest {
             when (it) {
                 is UiEvents.NavigateEvent -> navigateToApplication(it.route)

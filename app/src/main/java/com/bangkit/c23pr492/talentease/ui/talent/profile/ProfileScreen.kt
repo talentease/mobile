@@ -162,7 +162,7 @@ fun ProfileContentScreen(
                 },
                 readOnly = readOnly,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
                 ),
                 leadingIcon = {

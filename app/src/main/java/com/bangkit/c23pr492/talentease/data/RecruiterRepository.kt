@@ -47,11 +47,11 @@ class RecruiterRepository(
         }
     }
 
-    fun updateApplication(token: String, applicationId: String, status: StatusModel) = flow {
+    fun updateApplication(token: String, userId: String, status: StatusModel) = flow {
         emit(Resource.Loading)
         try {
             val response =
-                apiService.updateApplication(generateBearerToken(token), applicationId, status)
+                apiService.updateApplication(generateBearerToken(token), userId, status)
             emit(Resource.Success(response))
         } catch (e: Exception) {
             Log.e(Const.tagRepository, Log.getStackTraceString(e))

@@ -5,9 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -141,7 +139,9 @@ fun DetailApplicationContentScreen(
     ) { innerPadding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
         ) {
             application.data.apply {
                 //deskripsi posisi
@@ -200,11 +200,11 @@ fun DetailApplicationContentScreen(
                                 contentDescription = "CV"
                             )
                             HyperlinkText(
-                                fullText = "Click here to open CV",
+                                fullText = "Click here to download CV",
                                 linkText = listOf("Click here to download CV"),
                                 hyperlinks = listOf(cv),
                                 linkTextColor = MaterialTheme.colorScheme.primary,
-                                )
+                            )
                         }
                     }
                 }
@@ -214,7 +214,8 @@ fun DetailApplicationContentScreen(
                             if (summarize) {
                                 updateSummarize(false)
                             } else {
-                                summarizeCv(token, PredictionModel(id))
+                                Log.d("candidateId", "DetailApplicationContentScreen: $candidateId")
+                                summarizeCv(token, PredictionModel(candidateId))
                                 updateSummarize(true)
                             }
                         },
@@ -236,14 +237,15 @@ fun DetailApplicationContentScreen(
                             }
                         }
                     }
-                    if (summarize) {
-                        summarizeState.value.let {
-                            when (it) {
-                                UiState.Empty -> loading(false)
-                                is UiState.Error -> loading(false)
-                                UiState.Initial -> loading(false)
-                                UiState.Loading -> loading(true)
-                                is UiState.Success -> {
+                    val summarizeState = summarizeState.collectAsState()
+                    summarizeState.value.let {
+                        when (it) {
+                            UiState.Empty -> loading(false)
+                            is UiState.Error -> loading(false)
+                            UiState.Initial -> loading(false)
+                            UiState.Loading -> loading(true)
+                            is UiState.Success -> {
+                                if (summarize) {
                                     Card(Modifier.fillMaxWidth()) {
                                         Column(
                                             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -262,21 +264,10 @@ fun DetailApplicationContentScreen(
                                             }
                                             it.data.skills?.let { skills ->
                                                 OutlinedTextField(
-                                                    value = skills.joinToString(" , "),
+                                                    value = skills,
                                                     onValueChange = {},
                                                     label = {
                                                         Text(text = "Skills")
-                                                    },
-                                                    singleLine = false,
-                                                    readOnly = true
-                                                )
-                                            }
-                                            it.data.experience?.let { experience ->
-                                                OutlinedTextField(
-                                                    value = experience.joinToString(" , "),
-                                                    onValueChange = {},
-                                                    label = {
-                                                        Text(text = "Experience")
                                                     },
                                                     singleLine = false,
                                                     readOnly = true
@@ -322,6 +313,7 @@ fun DetailApplicationContentScreen(
                     Text(text = "Save Changes")
                 }
             }
+            Spacer(modifier = Modifier.padding(bottom = 80.dp))
         }
     }
 }

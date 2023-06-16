@@ -38,7 +38,7 @@ class DetailApplicationViewModel(private val repository: RecruiterRepository) : 
         private set
 
     fun loading(input: Boolean) {
-        summarize = input
+        isLoading = input
     }
 
     private val _summarizeState =
